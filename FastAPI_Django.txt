@@ -1,0 +1,109 @@
+1. Додати Django до FastAPI через WSGI
+FastAPI підтримує інтеграцію з WSGI-додатками, що дозволяє запускати Django разом із FastAPI.
+
+Кроки:
+Налаштуйте Django у вашому проєкті: Установіть Django і створіть базову конфігурацію:
+
+pip install django
+django-admin startproject mydjango
+Налаштуйте Django як WSGI-додаток: У файлі mydjango/wsgi.py вже є WSGI-додаток application. Це потрібно використати для інтеграції.
+
+Інтегруйте Django з FastAPI: У головному файлі вашого FastAPI-додатка (наприклад, main.py):
+
+from fastapi import FastAPI
+from starlette.middleware.wsgi import WSGIMiddleware
+from mydjango.wsgi import application as django_app
+
+app = FastAPI()
+
+# Додаємо маршрути FastAPI
+@app.get("/api")
+async def fastapi_root():
+    return {"message": "Hello from FastAPI!"}
+
+# Інтегруємо Django як частину FastAPI
+app.mount("/django", WSGIMiddleware(django_app))
+Тепер всі маршрути Django будуть доступні за адресою /django.
+
+
+
+Так, можна інтегрувати Django в існуючий FastAPI проєкт. Це зручно, якщо ви вже працюєте з FastAPI, але хочете використовувати деякі функції Django, наприклад, його адміністративний інтерфейс, ORM або систему аутентифікації.
+
+Ось як це зробити:
+
+1. Додати Django до FastAPI через WSGI
+FastAPI підтримує інтеграцію з WSGI-додатками, що дозволяє запускати Django разом із FastAPI.
+
+Кроки:
+Налаштуйте Django у вашому проєкті: Установіть Django і створіть базову конфігурацію:
+
+bash
+Copy code
+pip install django
+django-admin startproject mydjango
+Налаштуйте Django як WSGI-додаток: У файлі mydjango/wsgi.py вже є WSGI-додаток application. Це потрібно використати для інтеграції.
+
+Інтегруйте Django з FastAPI: У головному файлі вашого FastAPI-додатка (наприклад, main.py):
+
+python
+Copy code
+from fastapi import FastAPI
+from starlette.middleware.wsgi import WSGIMiddleware
+from mydjango.wsgi import application as django_app
+
+app = FastAPI()
+
+# Додаємо маршрути FastAPI
+@app.get("/api")
+async def fastapi_root():
+    return {"message": "Hello from FastAPI!"}
+
+# Інтегруємо Django як частину FastAPI
+app.mount("/django", WSGIMiddleware(django_app))
+Тепер всі маршрути Django будуть доступні за адресою /django.
+
+
+
+2. Об’єднати FastAPI та Django через ASGI
+Якщо ви використовуєте ASGI-сервер (наприклад, Uvicorn або Daphne), можна поєднати Django через ASGI.
+
+Установіть django-asgi: Установіть залежності:
+
+pip install daphne
+Налаштуйте Django як ASGI-додаток: У файлі mydjango/asgi.py знайдіть get_asgi_application.
+
+Інтеграція з FastAPI: У main.py додайте наступне:
+
+from fastapi import FastAPI
+from mydjango.asgi import application as django_app
+
+app = FastAPI()
+
+@app.get("/")
+async def fastapi_root():
+    return {"message": "Hello from FastAPI!"}
+
+# Інтегруємо Django через ASGI
+app.mount("/django", django_app)
+
+
+
+3. Спільна база даних
+Щоб Django і FastAPI працювали з однією базою даних, переконайтеся, що налаштування Django (файл settings.py) відповідають вашим потребам. Ви також можете використовувати ORM Django в FastAPI, якщо потрібно.
+
+Приклад:
+
+import os
+import django
+from mydjango.models import MyModel
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mydjango.settings')
+django.setup()
+
+@app.get("/data")
+async def get_data():
+    data = MyModel.objects.all()
+    return {"data": list(data.values())}
+
+
+Цей підхід дозволяє використовувати найкраще від обох світів: швидкість FastAPI для API та потужні інструменти Django для адміністративних завдань! 

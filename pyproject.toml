@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "gorestfastapi"
+version = "0.1.0"
+description = ""
+authors = ["OleksaSolo <9095945@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.104.1"
+uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
+sqlalchemy = "^2.0.23"
+psycopg2 = "^2.9.9"
+alembic = "^1.13.0"
+libgravatar = "^1.0.4"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.6"
+email-validator = "^2.1.0.post1"
+python-dotenv = "^1.0.0"
+fastapi-mail = "^1.4.1"
+bcrypt = "^4.1.2"
+fastapi-limiter = "^0.1.5"
+cloudinary = "^1.37.0"
+sphinx = "^7.2.6"
+httpx = "^0.26.0"
+pytest-asyncio = "^0.23.3"
+aiohttp = "^3.9.1"
+qrcode = "^7.4.2"
+
+
+[tool.poetry.group.dev.dependencies]
+sphinx = "^7.2.6"
+pytest = "^7.4.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+filterwarnings = "ignore::DeprecationWarning"
