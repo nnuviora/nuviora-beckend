@@ -1,6 +1,13 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from scr.conf.config import config
+
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_DOMAIN = os.getenv("DB_DOMAIN")
+DB_PORT = os.getenv("DB_PORT", 5432)  # Default to 5432 if not set
+DB_DB = os.getenv("DB_DB")
 
 # SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://postgres:567234@localhost:5432/postgres"
 # SQLALCHEMY_DATABASE_URL = "postgresql+asyncpg://${config.PG_USER}:${config.PG_PASSWORD}@${config.PG_DOMAIN}:${config.PG_PORT}/${config.PG_DB}"
