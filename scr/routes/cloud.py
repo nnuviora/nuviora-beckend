@@ -410,7 +410,7 @@ def qr_codes_and_update_transformed_image(image_id: str, db: Session = Depends(g
 
     return {"error": "Image not found."}
 
-
+"""
 @router.get("/qr_load/{image_id}")
 def qr_codes_image_load(
         image_id: str,
@@ -447,3 +447,4 @@ def qr_codes_image_load(
 
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND)
+"""
