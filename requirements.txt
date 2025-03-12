@@ -52,7 +52,7 @@ Pygments
 pypng
 pytest
 pytest-asyncio
-python-dotenv
+python-dotenv>=0.21.0
 python-jose[cryptography]
 python-multipart
 PyYAML
