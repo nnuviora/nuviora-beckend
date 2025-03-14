@@ -7,11 +7,11 @@ class Settings(BaseSettings):
     DB_URL: str
     SECRET_KEY_JWT: str
     ALGORITHM: str
-    PG_DB: str
-    PG_USER: str
-    PG_PASSWORD: str
-    PG_PORT: int
-    PG_DOMAIN: str
+    DB_DB: str
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_PORT: int
+    DB_DOMAIN: str
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
     MAIL_FROM: str
