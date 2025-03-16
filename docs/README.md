@@ -17,7 +17,7 @@ This project is an API developed using FastAPI. It utilizes Docker for container
 First, clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/project-name.git](https://github.com/nnuviora/nuviora-beckend.git
+git clone https://github.com/nnuviora/nuviora-beckend.git
 cd project-name
 ```
 
