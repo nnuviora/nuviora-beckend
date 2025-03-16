@@ -25,8 +25,9 @@ This project is an API developed using **FastAPI**. It utilizes Docker for conta
 ├── src/
 │   ├── api/                      
 │   │   └── v1/
-│   │       ├── endpoints/        # API endpoint definitions
-│   │       └── dependencies.py   # Dependency injection or shared dependencies
+│   │   |   ├── endpoints/        # API endpoint definitions
+│   │   |   └── dependencies.py   # Dependency injection or shared dependencies
+│   │   └── routers.py            # API route definitions and router setup
 │   ├── models/                   # Database models (SQLAlchemy)
 │   ├── repositories/             # Repository layer for database access
 │   ├── schemas/                  # Pydantic or Marshmallow schemas for validation
