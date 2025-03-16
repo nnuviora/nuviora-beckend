@@ -1,5 +1,4 @@
-add step how stop docker-compose
-# FastAPI Project with Docker, PostgreSQL, and Redis
+# Nuviora Backend
 
 This project is an API developed using FastAPI. It utilizes Docker for containerization, PostgreSQL for data storage, and Redis for caching and task queues. The project supports file processing using background tasks.
 
@@ -11,7 +10,6 @@ This project is an API developed using FastAPI. It utilizes Docker for container
 - **Docker Compose** — For managing multi-container Docker applications.
 - **Nginx** — A proxy server for handling HTTP requests.
 - **SQLAlchemy** — An ORM for working with PostgreSQL.
-- **BackgroundTasks** — For asynchronous task processing.
 
 ## Installation and Running
 
@@ -19,7 +17,7 @@ This project is an API developed using FastAPI. It utilizes Docker for container
 First, clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/project-name.git
+git clone https://github.com/nnuviora/nuviora-beckend.git
 cd project-name
 ```
 
