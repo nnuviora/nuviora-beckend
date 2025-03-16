@@ -1,3 +1,0 @@
-REDIS_HOST=redis-10936.c250.eu-central-1-1.ec2.cloud.redislabs.com
-REDIS_PORT=10936
-REDIS_PASSWORD=g0oqZcAN5vbLazSoBCuAStlLHMB0ZzjX
