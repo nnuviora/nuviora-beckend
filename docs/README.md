@@ -1,0 +1,69 @@
+add step how stop docker-compose
+# FastAPI Project with Docker, PostgreSQL, and Redis
+
+This project is an API developed using FastAPI. It utilizes Docker for containerization, PostgreSQL for data storage, and Redis for caching and task queues. The project supports file processing using background tasks.
+
+## Technology Stack
+- **FastAPI** — A fast web framework for building APIs.
+- **PostgreSQL** — A relational database management system for data storage.
+- **Redis** — A system for caching and task queues.
+- **Docker** — For application containerization.
+- **Docker Compose** — For managing multi-container Docker applications.
+- **Nginx** — A proxy server for handling HTTP requests.
+- **SQLAlchemy** — An ORM for working with PostgreSQL.
+- **BackgroundTasks** — For asynchronous task processing.
+
+## Installation and Running
+
+### 1. Clone the Repository
+First, clone this repository:
+
+```bash
+git clone https://github.com/yourusername/project-name.git
+cd project-name
+```
+
+### 2. Set Up Environment Variables
+Create a `.env` file and configure your environment variables as needed.
+
+### 3. Start the Application with Docker Compose
+Run the following command to build and start the containers:
+
+Start: 
+```bash
+docker-compose up --build
+```
+
+Stop:
+```bash
+docker-compose down
+```
+
+### 4. Access the API
+Once the application is running, you can access the API documentation at:
+
+- **Swagger UI**: [http://localhost/docs](http://localhost/docs)
+- **Redoc**: [http://localhost/redoc](http://localhost/redoc)
+- **Website URL**: [http://yourwebsite.com](http://yourwebsite.com)
+
+## Configuration Details
+
+### Nginx
+Nginx is used as a reverse proxy to route requests to the FastAPI application. It listens on port 80 and forwards requests to the FastAPI app running on port 8000. Static files are also served via Nginx.
+
+To access the API through Nginx, navigate to:
+- [http://localhost](http://localhost) for the main API
+- [http://localhost/docs](http://localhost/docs) for Swagger UI
+
+### Docker
+Docker is used to containerize the application, ensuring a consistent environment across different systems. The FastAPI application runs inside a container, along with PostgreSQL and Redis as separate services.
+
+### Docker Compose
+Docker Compose simplifies the management of multiple containers. It defines services for the database, cache, application, and Nginx proxy, handling their dependencies and networking automatically.
+
+## Usage
+- The API provides endpoints for handling data storage, caching, and background processing.
+- Use Swagger UI to test the API endpoints interactively.
+
+## Contributing
+Feel free to submit issues or pull requests if you want to contribute to the project.
