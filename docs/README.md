@@ -10,7 +10,6 @@ This project is an API developed using FastAPI. It utilizes Docker for container
 - **Docker Compose** — For managing multi-container Docker applications.
 - **Nginx** — A proxy server for handling HTTP requests.
 - **SQLAlchemy** — An ORM for working with PostgreSQL.
-- **BackgroundTasks** — For asynchronous task processing.
 
 ## Installation and Running
 
