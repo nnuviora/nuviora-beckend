@@ -2,14 +2,43 @@
 
 This project is an API developed using FastAPI. It utilizes Docker for containerization, PostgreSQL for data storage, and Redis for caching and task queues. The project supports file processing using background tasks.
 
+# Nuviora Backend
+
+This project is an API developed using **FastAPI**. It utilizes Docker for containerization, PostgreSQL for data storage, and Redis for caching and task queues. The project supports file processing using background tasks and provides a scalable architecture for handling various services.
+
 ## Technology Stack
 - **FastAPI** — A fast web framework for building APIs.
 - **PostgreSQL** — A relational database management system for data storage.
 - **Redis** — A system for caching and task queues.
 - **Docker** — For application containerization.
 - **Docker Compose** — For managing multi-container Docker applications.
-- **Nginx** — A proxy server for handling HTTP requests.
+- **Nginx** — A reverse proxy for handling HTTP requests.
 - **SQLAlchemy** — An ORM for working with PostgreSQL.
+
+## Project Structure
+
+```plaintext
+├── docker/
+│   └── Dockerfile                # Dockerfile for container setup
+├── nginx/
+│   └── nginx.conf                # Nginx configuration
+├── src/
+│   ├── api/                      
+│   │   └── v1/
+│   │       ├── endpoints/        # API endpoint definitions
+│   │       └── dependencies.py   # Dependency injection or shared dependencies
+│   ├── models/                   # Database models (SQLAlchemy)
+│   ├── repositories/             # Repository layer for database access
+│   ├── schemas/                  # Pydantic or Marshmallow schemas for validation
+│   ├── services/                 # Core business logic
+│   ├── utils/                    # Utility functions
+│   ├── config.py                 # Configuration settings
+│   ├── database.py               # Database setup and connection management
+│   └── main.py                   # Entry point for the application
+├── test/                         # Unit and integration tests
+├── docker-compose.yml            # Docker Compose file for multi-container setup
+└── .gitignore                    # Git ignore file
+```
 
 ## Installation and Running
 
