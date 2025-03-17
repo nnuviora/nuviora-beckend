@@ -44,7 +44,7 @@ First, clone this repository:
 
 ```bash
 git clone https://github.com/nnuviora/nuviora-beckend.git
-cd project-name
+cd nuviora-beckend
 ```
 
 ### 2. Set Up Environment Variables
