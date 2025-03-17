@@ -8,11 +8,15 @@ This project is an API developed using **FastAPI**. It utilizes Docker for conta
 - **Redis** — A system for caching and task queues.
 - **Docker** — For application containerization.
 - **Docker Compose** — For managing multi-container Docker applications.
+- **Nginx** — A reverse proxy for handling HTTP requests.
 - **SQLAlchemy** — An ORM for working with PostgreSQL.
 
 ## Project Structure
 
 ```plaintext
+├── nginx/
+|   ├── Dockerfile.nginx          # Nginx container
+│   └── nginx.conf                # Nginx configuration
 ├── src/
 │   ├── api/                      
 │   │   └── v1/
@@ -24,7 +28,7 @@ This project is an API developed using **FastAPI**. It utilizes Docker for conta
 │   ├── schemas/                  # Pydantic or Marshmallow schemas for validation
 │   ├── services/                 # Core business logic
 │   ├── utils/                    # Utility functions
-│   ├── Dockerfile                # Dockerfile for container setup
+|   ├── Dockerfile                # Dockerfile for container setup
 │   ├── config.py                 # Configuration settings
 │   ├── database.py               # Database setup and connection management
 │   └── main.py                   # Entry point for the application
@@ -40,7 +44,7 @@ First, clone this repository:
 
 ```bash
 git clone https://github.com/nnuviora/nuviora-beckend.git
-cd project-name
+cd nuviora-beckend
 ```
 
 ### 2. Set Up Environment Variables
@@ -62,11 +66,18 @@ docker-compose down
 ### 4. Access the API
 Once the application is running, you can access the API documentation at:
 
-- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Redoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+- **Swagger UI**: [http://localhost/docs](http://localhost/docs)
+- **Redoc**: [http://localhost/redoc](http://localhost/redoc)
 - **Website URL**: [http://yourwebsite.com](http://yourwebsite.com)
 
 ## Configuration Details
+
+### Nginx
+Nginx is used as a reverse proxy to route requests to the FastAPI application. It listens on port 80 and forwards requests to the FastAPI app running on port 8000. Static files are also served via Nginx.
+
+To access the API through Nginx, navigate to:
+- [http://localhost](http://localhost) for the main API
+- [http://localhost/docs](http://localhost/docs) for Swagger UI
 
 ### Docker
 Docker is used to containerize the application, ensuring a consistent environment across different systems. The FastAPI application runs inside a container, along with PostgreSQL and Redis as separate services.

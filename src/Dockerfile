@@ -2,11 +2,10 @@ FROM python:3.11
 
 WORKDIR /app
 
-COPY src/requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt .
+COPY . .
 
-COPY src /app
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
 
