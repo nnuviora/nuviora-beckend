@@ -29,7 +29,6 @@ This project is an API developed using **FastAPI**. It utilizes Docker for conta
 │   ├── database.py               # Database setup and connection management
 │   └── main.py                   # Entry point for the application
 ├── test/                         # Unit and integration tests
-├── docker-compose.yml            # Docker Compose file for multi-container setup
 └── .gitignore                    # Git ignore file
 ```
 
