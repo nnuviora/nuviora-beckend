@@ -28,7 +28,7 @@ services:
       - fastapi
 
   db:
-    image: postgres:latest
+    image: postgres:15
     container_name: postgres_db
     env_file:
       - .env
