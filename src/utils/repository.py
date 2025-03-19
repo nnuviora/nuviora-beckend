@@ -3,6 +3,7 @@ from typing import Any, Union
 import uuid
 
 from database import async_session_maker
+from utils.logging import loggerObj
 
 
 class AbstractRepository(ABC):
@@ -35,14 +36,23 @@ class SqlLayer(AbstractRepository):
     async def insert(self, data: dict) -> dict:
         async with async_session_maker() as session:
             try:
-                pass
+                obj = self.model(**data)
+                session.add(obj)
+                await session.commit()
+                loggerObj.info(f"Inserted new {self.model.__name__} ID {obj.id}")
+                return obj
             except Exception as e:
-                raise Exception(f"Insert Error in {self.model.__class__.__name__}: {e}")
+                #raise Exception(f"Insert Error in {self.model.__class__.__name__}: {e}")
+                loggerObj.error(f"Insert Error in {self.model.__name__}: {e}", exc_info=True)
+                raise
             
     async def get(self, *args: Any, **kwargs: Any) -> dict:
         async with async_session_maker() as session:
             try:
-                pass
+                #pass
+                obj = await session.get(self.model, kwargs.get("id"))
+                loggerObj.debug(f"Fetched {self.model.__name__} with ID: {kwargs.get('id')}")
+                return obj
             except Exception as e:
                 raise Exception(f"Get Error in {self.model.__class__.__name__}: {e}")
             
