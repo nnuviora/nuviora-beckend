@@ -26,6 +26,7 @@ class UserModel(Base):
 
     role: Mapped["RoleModel"] = relationship(back_populates="user")
     token: Mapped["TokenModel"] = relationship(back_populates="user")
+    address: Mapped["AddressModel"] = relationship(back_populates="user")
 
     async def to_dict(self) -> dict:
         return {
@@ -54,6 +55,8 @@ class AddressModel(Base):
     country: Mapped[str] = mapped_column() #Warning
     is_default: Mapped[bool] = mapped_column(default=False)
 
+    user: Mapped["UserModel"] = relationship(back_populates="address")
+
 
 class TokenModel(Base):
     __tablename__ = "tokens"
@@ -75,3 +78,6 @@ class RoleModel(Base):
     role: Mapped[str] = mapped_column()
 
     user: Mapped["UserModel"] = relationship(back_populates="role")
+
+    async def to_dict(self):
+        pass

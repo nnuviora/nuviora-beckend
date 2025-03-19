@@ -1,5 +1,7 @@
+from typing import Annotated
+
 from fastapi.routing import APIRouter
-from fastapi import status
+from fastapi import status, Depends
 
 
 router = APIRouter(prefix="/health", tags=["Health"])
