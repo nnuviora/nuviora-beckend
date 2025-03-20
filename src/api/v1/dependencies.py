@@ -3,6 +3,4 @@ from repositories.user_repo import UserRepository
 
 
 def user_dep() -> AuthService:
-    return AuthService(
-        user_repo=UserRepository
-    )
+    return AuthService(user_repo=UserRepository)

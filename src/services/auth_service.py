@@ -3,6 +3,7 @@ from typing import Protocol
 
 from utils.repository import AbstractRepository
 
+
 class AuthService(Protocol):
     def __init__(self, user_repo) -> None:
         self.user_repo: AbstractRepository = user_repo()

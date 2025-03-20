@@ -13,7 +13,7 @@ def get_application() -> FastAPI:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-    application = FastAPI()
+    application = FastAPI(docs_url="/docs")
     # admin = Admin(app=application, engine=engine)
 
     application.add_event_handler("startup", startup)
