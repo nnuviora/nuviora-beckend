@@ -11,9 +11,12 @@ class UserModel(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(default=uuid.uuid4, primary_key=True, unique=True, index=True)
+    auth_type: Mapped[str] = mapped_column()
     username: Mapped[str] = mapped_column()
     email: Mapped[str] = mapped_column(unique=True)
-    fullname: Mapped[str] = mapped_column()
+    first_name: Mapped[str] = mapped_column()
+    last_name: Mapped[str] = mapped_column()
+    avatar: Mapped[str] = mapped_column(nullable=True)
     phone: Mapped[str] = mapped_column()
     birth_date: Mapped[datetime] = mapped_column(default=datetime.now())
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
@@ -22,7 +25,7 @@ class UserModel(Base):
     is_locked: Mapped[bool] = mapped_column(default=False)
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"))
 
-    hash_password: Mapped[str] = mapped_column()
+    hash_password: Mapped[str] = mapped_column(nullable=True)
 
     role: Mapped["RoleModel"] = relationship(back_populates="user")
     token: Mapped["TokenModel"] = relationship(back_populates="user")
@@ -33,7 +36,9 @@ class UserModel(Base):
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "fullname": self.fullname,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "avatar": self.avatar,
             "phone": self.phone,
             "birth_date": self.birth_date,
             "created_at": self.created_at,
@@ -57,6 +62,18 @@ class AddressModel(Base):
 
     user: Mapped["UserModel"] = relationship(back_populates="address")
 
+    async def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "address_line": self.address_line,
+            "city": self.city,
+            "state": self.state,
+            "postal_code": self.postal_code,
+            "country": self.country,
+            "is_default": self.is_default
+        }
+
 
 class TokenModel(Base):
     __tablename__ = "tokens"
@@ -69,6 +86,16 @@ class TokenModel(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
 
     user: Mapped["UserModel"] = relationship(back_populates="token")
+
+    async def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "refresh_token": self.refresh_token,
+            "expires_at": self.expires_at,
+            "user_agent": self.user_agent,
+            "created_at": self.created_at
+        }
 
 
 class RoleModel(Base):

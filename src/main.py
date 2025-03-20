@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqladmin import Admin
 
 from database import engine, Base
-from api.routers import routers
-from admin.routes import routes
+from api.routers import routers as api_routers
+from admin.routes import routers as view_routers
 
 
 def get_application() -> FastAPI:
@@ -14,7 +14,7 @@ def get_application() -> FastAPI:
             await conn.run_sync(Base.metadata.create_all)
 
     application = FastAPI()
-    # admin = Admin(app=application, engine=engine)
+    admin = Admin(app=application, engine=engine)
 
     application.add_event_handler("startup", startup)
 
@@ -28,10 +28,10 @@ def get_application() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # for view in routes:
-    #     admin.add_view(view)
+    for view in view_routers:
+        admin.add_view(view)
 
-    for router in routers:
+    for router in api_routers:
         application.include_router(router=router)
 
     return application
