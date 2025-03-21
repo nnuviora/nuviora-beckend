@@ -9,6 +9,7 @@ from database import Base
 
 class UserModel(Base):
     __tablename__ = "users"
+    __table_args__ = {"extend_existing": True}
 
     id: Mapped[uuid.UUID] = mapped_column(
         default=uuid.uuid4, primary_key=True, unique=True, index=True
