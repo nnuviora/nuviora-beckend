@@ -10,5 +10,5 @@ def auth_dep() -> AuthService:
         user_repo=UserRepository,
         cache_manager=RedisManager,
         email_manager=AwsSender,
-        security_layer=JWTAuth
+        security_layer=JWTAuth,
     )

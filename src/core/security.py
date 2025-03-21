@@ -22,7 +22,9 @@ class JWTAuth(SecurityBase):
     def __init__(self):
         pass
 
-    async def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> dict:
+    async def create_access_token(
+        self, data: dict, expires_delta: timedelta | None = None
+    ) -> dict:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta

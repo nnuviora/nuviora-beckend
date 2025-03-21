@@ -10,7 +10,9 @@ from database import Base
 class UserModel(Base):
     __tablename__ = "users"
 
-    id: Mapped[uuid.UUID] = mapped_column(default=uuid.uuid4, primary_key=True, unique=True, index=True)
+    id: Mapped[uuid.UUID] = mapped_column(
+        default=uuid.uuid4, primary_key=True, unique=True, index=True
+    )
     auth_type: Mapped[str] = mapped_column()
     username: Mapped[str] = mapped_column()
     email: Mapped[str] = mapped_column(unique=True)
@@ -73,7 +75,7 @@ class AddressModel(Base):
             "state": self.state,
             "postal_code": self.postal_code,
             "country": self.country,
-            "is_default": self.is_default
+            "is_default": self.is_default,
         }
 
 
@@ -98,7 +100,7 @@ class TokenModel(Base):
             "refresh_token": self.refresh_token,
             "expires_at": self.expires_at,
             "user_agent": self.user_agent,
-            "created_at": self.created_at
+            "created_at": self.created_at,
         }
 
 

@@ -26,7 +26,7 @@ class RedisManager(AbstractCache):
         token = uuid.uuid4()
         self.redis.hset(key=token, mapping=data)
         return token
-    
+
     async def get(self, token: str) -> dict:
         data = self.redis.hget(key=token)
         return data
