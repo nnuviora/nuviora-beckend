@@ -12,6 +12,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+
+
+
+    env:  # ✅ Set environment variables for the database
+      PROJECT_NAME: "MyProject"
+      POSTGRES_DB: "test_db"
+      POSTGRES_USER: "test_user"
+      POSTGRES_PASSWORD: "test_password"
+      POSTGRES_HOST: "localhost"
+      POSTGRES_PORT: "5432"
+
+    services:  # ✅ Set up a PostgreSQL database for testing
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
