@@ -26,6 +26,10 @@ jobs:
 
       - name: Run Black Formatter
         run: |
+          black --check .
+          
+      - name: Run Black Formatter (to auto-format if no error)
+        run: |
           black .
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
