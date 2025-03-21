@@ -10,10 +10,10 @@ class SecurityBase:
 
     async def hash_password(self, password: str) -> str:
         return self.pwd_context.hash(password)
-    
+
     async def verify_password(self, password: str, hash_password: str) -> bool:
         return self.pwd_context.verify(password, hash_password)
-    
+
 
 class JWTAuth(SecurityBase):
     SECRET_KEY = None
