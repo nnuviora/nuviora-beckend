@@ -21,6 +21,16 @@ services:
       retries: 5
       start_period: 10s
 
+  redis:
+    image: redis:7
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+
   fastapi:
     build:
       context: ./src
@@ -31,11 +41,14 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_started
 
   nginx:
     build:
@@ -51,3 +64,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:

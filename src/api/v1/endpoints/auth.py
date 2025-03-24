@@ -1,4 +1,3 @@
-import uuid
 from typing import Annotated
 
 from fastapi.routing import APIRouter
@@ -18,7 +17,6 @@ auth_depends = Annotated[AuthService, Depends(auth_dep)]
 async def register(
     request: Request, service: auth_depends, data: RegisterSchema
 ) -> dict:
-    print(request.headers)
     data = data.model_dump(exclude=["id"])
     data["user_agent"] = request.headers["User-Agent"]
     data["auth_type"] = "username"
