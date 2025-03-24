@@ -1,4 +1,4 @@
-from admin.views.user_view import UserView
+from admin.views.user_view import UserView, RoleView, TokenView
 
 
-routers = [UserView]
+routers = [UserView, RoleView, TokenView]

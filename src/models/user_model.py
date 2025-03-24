@@ -13,19 +13,22 @@ class UserModel(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         default=uuid.uuid4, primary_key=True, unique=True, index=True
     )
-    auth_type: Mapped[str] = mapped_column()
+    auth_type: Mapped[str] = mapped_column(nullable=True)
     username: Mapped[str] = mapped_column()
     email: Mapped[str] = mapped_column(unique=True)
-    first_name: Mapped[str] = mapped_column()
-    last_name: Mapped[str] = mapped_column()
+    first_name: Mapped[str] = mapped_column(nullable=True)
+    last_name: Mapped[str] = mapped_column(nullable=True)
     avatar: Mapped[str] = mapped_column(nullable=True)
-    phone: Mapped[str] = mapped_column()
+    phone: Mapped[str] = mapped_column(nullable=True)
+    auth_type: Mapped[str] = mapped_column()
     birth_date: Mapped[datetime] = mapped_column(default=datetime.now())
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
     updated_at: Mapped[datetime] = mapped_column(default=datetime.now())
     is_activate: Mapped[bool] = mapped_column(default=False)
     is_locked: Mapped[bool] = mapped_column(default=False)
-    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"))
+    role_id: Mapped[int] = mapped_column(
+        ForeignKey("roles.id", ondelete="CASCADE"), default=2
+    )
 
     hash_password: Mapped[str] = mapped_column(nullable=True)
 
@@ -47,6 +50,7 @@ class UserModel(Base):
             "update_at": self.updated_at,
             "is_activate": self.is_activate,
             "is_locked": self.is_locked,
+            "hash_password": self.hash_password,
         }
 
 
@@ -86,7 +90,7 @@ class TokenModel(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE")
     )
-    refresh_token: Mapped[str] = mapped_column()
+    refresh_token: Mapped[str] = mapped_column(unique=True)
     expires_at: Mapped[datetime] = mapped_column()
     user_agent: Mapped[str] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())

@@ -22,10 +22,3 @@ class UserBaseSchema(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-class UserInDb(UserBaseSchema):
-    hash_password: str
-
-    class Config:
-        from_attributes = True
