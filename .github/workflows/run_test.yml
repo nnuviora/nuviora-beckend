@@ -22,6 +22,20 @@ jobs:
       POSTGRES_PASSWORD: "test_password"
       POSTGRES_HOST: "localhost"
       POSTGRES_PORT: "5432"
+      SECRET_KEY: "str" 
+      ALGORITHM: "str"
+      ACCESS_TOKEN_EXPIRE_MINUTES: "15"
+      REFRESH_TOKEN_EXPIRE_DAYS: "7"
+
+      SENDER: "test@test.com"
+      CHARSET: "UTF-8"
+      CONFIGURATION_SET: "test"
+      AWS_REGION: "test"
+      ACCESS_KEY: "test"
+      SECRET_ACCESS_KEY: "test"
+
+      REDIS_HOST: "test"
+      REDIS_PORT: "6379"
 
     services:  # ✅ Set up a PostgreSQL database for testing
       postgres:
@@ -32,6 +46,8 @@ jobs:
           POSTGRES_PASSWORD: test_password
         ports:
           - 5432:5432
+
+          
 
     steps:
       - name: Checkout repository
