@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+from pathlib import Path
 
-import boto3
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
+from fastapi_mail.errors import ConnectionErrors
+from pydantic import EmailStr
 
 from config import config_setting
-
 
 class AbstractEmail(ABC):
     def __init__(self) -> None:
@@ -16,49 +18,34 @@ class AbstractEmail(ABC):
     ):
         pass
 
-
-class AwsSender(AbstractEmail):
-    SENDER = config_setting.SENDER
-    CHARSET = config_setting.CHARSET
-    CONFIGURATION_SET = config_setting.CONFIGURATION_SET
+class MetaUaSender(AbstractEmail):
+    conf = ConnectionConfig(
+        MAIL_USERNAME=config_setting.MAIL_USERNAME,
+        MAIL_PASSWORD=config_setting.MAIL_PASSWORD,
+        MAIL_FROM=config_setting.MAIL_USERNAME,
+        MAIL_PORT=config_setting.MAIL_PORT,
+        MAIL_SERVER=config_setting.MAIL_SERVER,
+        MAIL_FROM_NAME="Test Systems",
+        MAIL_STARTTLS=False,
+        MAIL_SSL_TLS=True,
+        USE_CREDENTIALS=True,
+        VALIDATE_CERTS=True,
+        TEMPLATE_FOLDER=Path(__file__).parent / 'templates',
+    )
 
     def __init__(self) -> None:
-        self.client = boto3.client(
-            "ses",
-            region_name=config_setting.AWS_REGION,
-            aws_access_key_id=config_setting.ACCESS_KEY,
-            aws_secret_access_key=config_setting.SECRET_ACCESS_KEY,
-        )
+        self.fm = FastMail(self.conf)
 
     async def send_email(
         self, recipient: str, subject: str, body_text: Optional[str] = None
     ):
         try:
-            response = self.client.send_email(
-                Destination={
-                    "ToAddresses": [
-                        recipient,
-                    ],
-                },
-                Message={
-                    "Body": {
-                        "Html": {
-                            "Charset": self.CHARSET,
-                            "Data": "<h1>Hello</h1>",  # BODY_HTML,
-                        },
-                        "Text": {
-                            "Charset": self.CHARSET,
-                            "Data": body_text,
-                        },
-                    },
-                    "Subject": {
-                        "Charset": self.CHARSET,
-                        "Data": subject,
-                    },
-                },
-                Source=self.SENDER,
-                ConfigurationSetName=self.CONFIGURATION_SET,
+            message = MessageSchema(
+                subject=subject,
+                recipients=[recipient],
+                body=body_text or "",
+                subtype=MessageType.html
             )
-            return response
-        except Exception as e:
-            raise Exception(f"Error send email: {e}")
+            await self.fm.send_message(message)
+        except ConnectionErrors as err:
+            raise Exception(f"Error sending email: {err}")

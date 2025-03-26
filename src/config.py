@@ -39,6 +39,12 @@ class ConfigSettings(BaseSettings):
     ACCESS_KEY: str
     SECRET_ACCESS_KEY: str
 
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM: str
+    MAIL_PORT: int
+    MAIL_SERVER: str
+
     model_config = SettingsConfigDict(env_file="../.env", env_file_encoding="utf-8")
 
 

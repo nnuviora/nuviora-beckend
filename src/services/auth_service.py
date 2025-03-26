@@ -23,11 +23,11 @@ class AuthService(Protocol):
                 )
                 cache_data = await self.cache_manager.set(data=data)
                 print(cache_data)
-                # email = await self.email_manager.send_email(
-                #     recipient=data["email"],
-                #     subject="Email Verification",
-                #     body_text=f"http://localhost/auth/verify_email/{str(cache_data)}",
-                # )
+                email = await self.email_manager.send_email(
+                    recipient=data["email"],
+                    subject="Email Verification",
+                    body_text=f"http://localhost/auth/verify_email/{str(cache_data)}",
+                )
                 return {"message": "Message sended"}
 
             obj = await self.user_repo.insert(data=data)

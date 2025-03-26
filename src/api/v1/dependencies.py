@@ -7,8 +7,8 @@ from services.auth_service import AuthService
 from repositories.user_repo import UserRepository, TokenRepository
 from core.security import JWTAuth
 from utils.cache_manager import RedisManager
-from utils.email_manager import AwsSender
-
+# from utils.email_manager import AwsSender
+from utils.email_manager import MetaUaSender
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -18,9 +18,10 @@ async def auth_dep() -> AuthService:
         user_repo=UserRepository,
         refresh_repo=TokenRepository,
         cache_manager=RedisManager,
-        email_manager=AwsSender,
+        email_manager=MetaUaSender,
         security_layer=JWTAuth,
     )
+# email_manager=AwsSender,
 
 
 async def get_current_user(
