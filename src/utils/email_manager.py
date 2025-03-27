@@ -44,7 +44,7 @@ class AwsSender(AbstractEmail):
                     "Body": {
                         "Html": {
                             "Charset": self.CHARSET,
-                            "Data": "<h1>Hello</h1>",  # BODY_HTML,
+                            "Data": body_text,
                         },
                         "Text": {
                             "Charset": self.CHARSET,

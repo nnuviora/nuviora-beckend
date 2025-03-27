@@ -56,6 +56,11 @@ async def login(
     return service_action
 
 
+@router.get("/google_auth", status_code=status.HTTP_200_OK)
+async def google_auth():
+    pass
+
+
 @router.post("/refresh_access", status_code=status.HTTP_200_OK)
 async def refresh_access(sevice: auth_depends, request: Request, response: Response):
     refresh_token = request.cookies.get("refresh_token")
@@ -70,6 +75,13 @@ async def refresh_access(sevice: auth_depends, request: Request, response: Respo
     return {"access_token": service_action["access_token"]}
 
 
-@router.get("/logout", status_code=status.HTTP_200_OK)
-async def logout(service: auth_depends):
+@router.post("/forgot_password", status_code=status.HTTP_200_OK)
+async def forgot_password(data: None, service: auth_depends):
     pass
+
+
+@router.get("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def logout(request: Request, service: auth_depends):
+    refresh_token = request.cookies.get("refresh_token")
+    service_action = await service.logout_handler(refresh_token=refresh_token)
+    return service_action
