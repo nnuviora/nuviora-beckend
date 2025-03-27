@@ -26,7 +26,7 @@ class AuthService(Protocol):
                 email = await self.email_manager.send_email(
                     recipient=data["email"],
                     subject="Email Verification",
-                    body_text=str(cache_data),
+                    body_text=f"http://localhost/auth/verify_email/{str(cache_data)}",
                 )
                 return {"message": "Message sended"}
 

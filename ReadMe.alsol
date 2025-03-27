@@ -1,0 +1,9 @@
+pip install fastapi_mail
+bcrypt<4.0 (requirements.py)
+update 
+dependensies.py 
+emai_manager.py 
+.env
+config.py
+
+new in utils:  create __pycache__ , templates
