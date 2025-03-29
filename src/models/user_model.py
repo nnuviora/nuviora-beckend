@@ -14,7 +14,7 @@ class UserModel(Base):
         default=uuid.uuid4, primary_key=True, unique=True, index=True
     )
     auth_type: Mapped[str] = mapped_column(nullable=True)
-    username: Mapped[str] = mapped_column()
+    username: Mapped[str] = mapped_column(nullable=True)
     email: Mapped[str] = mapped_column(unique=True)
     first_name: Mapped[str] = mapped_column(nullable=True)
     last_name: Mapped[str] = mapped_column(nullable=True)

@@ -8,6 +8,7 @@ from pydantic import EmailStr
 
 from config import config_setting
 
+
 class AbstractEmail(ABC):
     def __init__(self) -> None:
         pass
@@ -17,6 +18,7 @@ class AbstractEmail(ABC):
         self, recipient: str, subject: str, body_text: Optional[str] = None
     ):
         pass
+
 
 class MetaUaSender(AbstractEmail):
     conf = ConnectionConfig(
@@ -30,7 +32,7 @@ class MetaUaSender(AbstractEmail):
         MAIL_SSL_TLS=True,
         USE_CREDENTIALS=True,
         VALIDATE_CERTS=True,
-        TEMPLATE_FOLDER=Path(__file__).parent / 'templates',
+        TEMPLATE_FOLDER=Path(__file__).parent / "templates",
     )
 
     def __init__(self) -> None:
@@ -44,7 +46,7 @@ class MetaUaSender(AbstractEmail):
                 subject=subject,
                 recipients=[recipient],
                 body=body_text or "",
-                subtype=MessageType.html
+                subtype=MessageType.html,
             )
             await self.fm.send_message(message)
         except ConnectionErrors as err:

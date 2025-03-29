@@ -45,6 +45,14 @@ class ConfigSettings(BaseSettings):
     MAIL_PORT: int
     MAIL_SERVER: str
 
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    GOOGLE_REDIRECT_URI: str
+
+    GOOGLE_AUTH_URL: str
+    GOOGLE_TOKEN_URL: str
+    GOOGLE_USERINFO_URL: str
+
     model_config = SettingsConfigDict(env_file="../.env", env_file_encoding="utf-8")
 
 

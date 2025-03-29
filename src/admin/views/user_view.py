@@ -3,7 +3,7 @@ from models.user_model import UserModel, RoleModel, TokenModel
 
 
 class UserView(ModelView, model=UserModel):
-    column_list = ["id", "username"]
+    column_list = ["id", "email"]
 
 
 class RoleView(ModelView, model=RoleModel):

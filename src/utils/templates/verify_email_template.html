@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Підтвердження Реєстрації | Nuviora</title>
+	<style>
+		@font-face {
+			font-family: 'Poppins';
+			font-style: normal;
+			font-weight: 400;
+			src: url('https://fonts.gstatic.com/s/poppins/v15/pxiEyp8kv8JHgFVrFJDUc1NECPY.ttf') format('truetype');
+		}
+
+		.poppins {
+			font-family: 'Poppins', Arial, sans-serif;
+		}
+	</style>
+</head>
+
+<body class="poppins" style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+	<table width="100%" cellspacing="0" cellpadding="0"
+		style="max-width: 600px; margin: 0 auto; border-collapse: collapse;">
+		<thead>
+			<tr style="background-color: #00b000; text-align: center;">
+				<td style="padding: 14px;">
+					<h1 style="color: white; margin: 0; font-size: 40px; line-height: 1.2;">
+						{{title}}
+					</h1>
+				</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr style="background-color: #fff;">
+				<td style="padding: 30px 30px 0 30px">
+					<p style=" margin: 0 0 15px 0; font-size: 18px; line-height: 1.6; color: #212121;">
+						Вітаємо, {ім'я користувача}!
+					</p>
+				</td>
+			</tr>
+			<tr style="background-color: #fff;">
+				<td style="padding: 0 30px">
+					<p style="margin: 0 0 15px 0; font-size: 18px; line-height: 1.6; color: #212121;">
+						Дякуємо за реєстрацію. Натисніть кнопку нижче для підтвердження вашого акаунта:
+					</p>
+				</td>
+			</tr>
+			<tr style="background-color: #fff;">
+				<td style="padding: 0 30px; text-align: center;">
+					<a href="{verification_link}"
+						style="font-size: 18px; display: inline-block; padding: 12px 24px; background-color: #00b000; color: #fff; text-decoration: none; border-radius: 10px; margin: 0 0 15px; font-weight: medium;">
+						Підтвердити Email: {{code}}
+					</a>
+				</td>
+			</tr>
+			<tr style="background-color: #fff;">
+				<td style="padding: 0 30px 30px">
+					<p style=" margin: 0; font-size: 18px; line-height: 1.6; color: #212121;">
+						Якщо ви не реєструвалися, проігноруйте цей лист.
+					</p>
+				</td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td style=" background-color: #00b000; padding: 14px; text-align: center; font-size: 12px; color: #fff;">
+					© {{year}} Nuviora. Усі права захищені.
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+</body>
+
+</html>
