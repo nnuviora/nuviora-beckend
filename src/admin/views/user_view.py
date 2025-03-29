@@ -1,5 +1,9 @@
 from sqladmin import ModelView
-from models.user_model import UserModel, RoleModel, TokenModel
+from models.user_model import (
+    UserModel,
+    RoleModel,
+    TokenModel,
+)
 
 
 class UserView(ModelView, model=UserModel):

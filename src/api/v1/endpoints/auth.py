@@ -15,7 +15,9 @@ auth_depends = Annotated[AuthService, Depends(auth_dep)]
 
 @router.post("/register", status_code=status.HTTP_200_OK)
 async def register(
-    request: Request, service: auth_depends, data: RegisterSchema
+    request: Request, 
+    service: auth_depends, 
+    data: RegisterSchema
 ) -> dict:
     data = data.model_dump(exclude=["id"])
     data["user_agent"] = request.headers["User-Agent"]
@@ -26,7 +28,9 @@ async def register(
 
 @router.get("/verify_email/{token}", status_code=status.HTTP_200_OK)
 async def verify_email(
-    service: auth_depends, token: str, response: Response
+    service: auth_depends, 
+    token: str, 
+    response: Response
 ) -> TokenSchema:
     service_action = await service.verify_handler(token=token)
     response.set_cookie(
@@ -41,7 +45,10 @@ async def verify_email(
 
 @router.post("/login", status_code=status.HTTP_200_OK)
 async def login(
-    service: auth_depends, data: LoginSchema, request: Request, response: Response
+    service: auth_depends, 
+    data: LoginSchema, 
+    request: Request, 
+    response: Response
 ) -> TokenSchema:
     data = data.model_dump()
     data["user_agent"] = request.headers["User-Agent"]

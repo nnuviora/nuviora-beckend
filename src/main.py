@@ -4,7 +4,9 @@ from sqladmin import Admin
 
 from database import engine, Base
 from api.routers import routers as api_routers
+
 from admin.routes import routers as view_routers
+
 
 
 def get_application() -> FastAPI:

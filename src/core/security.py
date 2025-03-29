@@ -1,4 +1,8 @@
-from datetime import timedelta, datetime, timezone
+from datetime import (
+    timedelta,
+    datetime,
+    timezone,
+)
 
 from passlib.context import CryptContext
 import jwt
@@ -8,12 +12,19 @@ from config import config_setting
 
 class SecurityBase:
     def __init__(self):
-        self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        self.pwd_context = CryptContext(
+            schemes=["bcrypt"],
+            deprecated="auto",
+        )
 
     async def hash_password(self, password: str) -> str:
         return self.pwd_context.hash(password)
 
-    async def verify_password(self, password: str, hash_password: str) -> bool:
+    async def verify_password(
+        self,
+        password: str,
+        hash_password: str,
+    ) -> bool:
         return self.pwd_context.verify(password, hash_password)
 
 
@@ -32,7 +43,9 @@ class JWTAuth(SecurityBase):
             )
             to_encode.update({"exp": expire})
             encoded_jwt = jwt.encode(
-                to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM
+                to_encode,
+                self.SECRET_KEY,
+                algorithm=self.ALGORITHM,
             )
             return encoded_jwt
         except Exception as e:
@@ -48,9 +61,14 @@ class JWTAuth(SecurityBase):
             )
             to_encode.update({"exp": expire})
             encoded_jwt = jwt.encode(
-                to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM
+                to_encode,
+                self.SECRET_KEY,
+                algorithm=self.ALGORITHM,
             )
-            return encoded_jwt, expire.replace(tzinfo=None)
+            return (
+                encoded_jwt,
+                expire.replace(tzinfo=None),
+            )
         except Exception as e:
             raise Exception(
                 f"Create Refresh Token Error in {self.create_refresh_token.__name__}: {e}"
@@ -58,7 +76,11 @@ class JWTAuth(SecurityBase):
 
     async def decode_token(self, token: str) -> dict:
         try:
-            payload = jwt.decode(token, self.SECRET_KEY, algorithms=self.ALGORITHM)
+            payload = jwt.decode(
+                token,
+                self.SECRET_KEY,
+                algorithms=self.ALGORITHM,
+            )
             return payload
         except Exception as e:
             raise Exception(f"Decode Token Error in {self.decode_token.__name__}: {e}")

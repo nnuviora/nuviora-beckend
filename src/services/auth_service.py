@@ -7,7 +7,12 @@ from utils.email_manager import AbstractEmail
 
 class AuthService(Protocol):
     def __init__(
-        self, user_repo, refresh_repo, cache_manager, email_manager, security_layer
+        self,
+        user_repo,
+        refresh_repo,
+        cache_manager,
+        email_manager,
+        security_layer,
     ) -> None:
         self.user_repo: AbstractRepository = user_repo()
         self.refesh_repo: AbstractRepository = refresh_repo()
@@ -72,7 +77,8 @@ class AuthService(Protocol):
                 raise Exception("Wrong login or password")  #
             if not (
                 await self.security_layer.verify_password(
-                    password=data["password"], hash_password=user_obj["hash_password"]
+                    password=data["password"],
+                    hash_password=user_obj["hash_password"],
                 )
             ):
                 raise Exception("Wrong login or password")  #
