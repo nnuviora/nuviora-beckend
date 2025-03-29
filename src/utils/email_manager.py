@@ -12,7 +12,10 @@ class AbstractEmail(ABC):
 
     @abstractmethod
     async def send_email(
-        self, recipient: str, subject: str, body_text: Optional[str] = None
+        self,
+        recipient: str,
+        subject: str,
+        body_text: Optional[str] = None,
     ):
         pass
 
@@ -31,7 +34,10 @@ class AwsSender(AbstractEmail):
         )
 
     async def send_email(
-        self, recipient: str, subject: str, body_text: Optional[str] = None
+        self,
+        recipient: str,
+        subject: str,
+        body_text: Optional[str] = None,
     ):
         try:
             response = self.client.send_email(

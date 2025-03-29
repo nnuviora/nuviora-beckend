@@ -1,5 +1,8 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import (
+    MagicMock,
+    patch,
+)
 import sys
 from datetime import datetime
 import uuid
@@ -9,7 +12,9 @@ sys.modules["src.models.user_model"] = MagicMock()
 sys.modules["src.models.user_model"].UserModel = MagicMock()
 
 # Now import the repository
-from src.repositories.user_repo import UserRepository
+from src.repositories.user_repo import (
+    UserRepository,
+)
 
 
 @pytest.fixture
@@ -71,7 +76,11 @@ def user_repository(patched_user_model):
     return UserRepository()
 
 
-def test_user_repository_model(mock_users, user_repository, patched_user_model):
+def test_user_repository_model(
+    mock_users,
+    user_repository,
+    patched_user_model,
+):
 
     assert isinstance(UserRepository.model, MagicMock)
 

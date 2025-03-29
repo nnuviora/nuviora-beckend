@@ -1,7 +1,11 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship,
+)
 from sqlalchemy import ForeignKey
 
 from database import Base
@@ -11,7 +15,10 @@ class UserModel(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        default=uuid.uuid4, primary_key=True, unique=True, index=True
+        default=uuid.uuid4,
+        primary_key=True,
+        unique=True,
+        index=True,
     )
     auth_type: Mapped[str] = mapped_column(nullable=True)
     username: Mapped[str] = mapped_column()
@@ -27,7 +34,11 @@ class UserModel(Base):
     is_activate: Mapped[bool] = mapped_column(default=False)
     is_locked: Mapped[bool] = mapped_column(default=False)
     role_id: Mapped[int] = mapped_column(
-        ForeignKey("roles.id", ondelete="CASCADE"), default=2
+        ForeignKey(
+            "roles.id",
+            ondelete="CASCADE",
+        ),
+        default=2,
     )
 
     hash_password: Mapped[str] = mapped_column(nullable=True)
@@ -57,9 +68,16 @@ class UserModel(Base):
 class AddressModel(Base):
     __tablename__ = "addresses"
 
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        unique=True,
+        index=True,
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE")
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE",
+        )
     )
     address_line: Mapped[str] = mapped_column()
     city: Mapped[str] = mapped_column()  # Warning
@@ -86,9 +104,16 @@ class AddressModel(Base):
 class TokenModel(Base):
     __tablename__ = "tokens"
 
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        unique=True,
+        index=True,
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE")
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE",
+        )
     )
     refresh_token: Mapped[str] = mapped_column(unique=True)
     expires_at: Mapped[datetime] = mapped_column()
@@ -111,7 +136,11 @@ class TokenModel(Base):
 class RoleModel(Base):
     __tablename__ = "roles"
 
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True, index=True)
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        unique=True,
+        index=True,
+    )
     role: Mapped[str] = mapped_column()
 
     user: Mapped["UserModel"] = relationship(back_populates="role")

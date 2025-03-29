@@ -23,7 +23,8 @@ class AbstractCache(ABC):
 class RedisManager(AbstractCache):
     def __init__(self) -> None:
         self.redis = Redis(
-            host=config_setting.REDIS_HOST, port=config_setting.REDIS_PORT
+            host=config_setting.REDIS_HOST,
+            port=config_setting.REDIS_PORT,
         )
 
     async def set(self, data: dict) -> str:
