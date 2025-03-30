@@ -11,7 +11,7 @@ from schemas.auth_schema import (
     TokenSchema,
     RegisterSchema,
     ChechEmailSchema,
-    ChangePassword
+    ChangePassword,
 )
 from services.auth_service import AuthService
 from api.v1.dependencies import auth_dep
@@ -35,9 +35,7 @@ auth_depends = Annotated[AuthService, Depends(auth_dep)]
         504: {"description": "External Service Is Not Responding"},
     },
 )
-async def register(
-    service: auth_depends, data: RegisterSchema
-) -> dict:
+async def register(service: auth_depends, data: RegisterSchema) -> dict:
     data = data.model_dump()
     data["auth_type"] = "local"
     service_action = await service.create_handler(data=data)
@@ -54,12 +52,9 @@ async def register(
     },
 )
 async def verify_email(
-    service: auth_depends, token: str, request: Request ,response: Response
+    service: auth_depends, token: str, request: Request, response: Response
 ) -> TokenSchema:
-    data = {
-        "user_agent": request.headers.get("User-Agent"),
-        "token": token
-    }
+    data = {"user_agent": request.headers.get("User-Agent"), "token": token}
     service_action = await service.email_verify_handler(data=data)
     response.set_cookie(
         key="refresh_token",
@@ -118,7 +113,7 @@ async def resend_email(user_id: uuid.UUID, service: auth_depends):
     responses={
         405: {"description": "Metod Not Allow"},
         500: {"description": "Internal Server Error"},
-        },
+    },
 )
 async def google_auth():
     params = {
@@ -139,7 +134,7 @@ async def google_auth():
     responses={
         405: {"description": "Metod Not Allow"},
         500: {"description": "Internal Server Error"},
-        },
+    },
 )
 async def auth_callback(
     request: Request, response: Response, service: auth_depends
@@ -185,18 +180,18 @@ async def auth_callback(
     "/refresh_access",
     status_code=status.HTTP_200_OK,
     responses={
-        401: {"description": "Unauthorized"}, 
+        401: {"description": "Unauthorized"},
         404: {"description": "User Not Found"},
         405: {"description": "Metod Not Allow"},
         500: {"description": "Internal Server Error"},
-        },
+    },
 )
 async def refresh_access(
     sevice: auth_depends, request: Request, response: Response
 ) -> TokenSchema:
     data = {
         "refresh_token": request.cookies.get("refresh_token"),
-        "user_agent": request.headers.get("User-Agent")
+        "user_agent": request.headers.get("User-Agent"),
     }
     service_action = await sevice.recreate_access_handler(data=data)
     response.set_cookie(
@@ -216,7 +211,7 @@ async def refresh_access(
         404: {"description": "User Not Found"},
         405: {"description": "Metod Not Allow"},
         500: {"description": "Internal Server Error"},
-        },
+    },
 )
 async def forgot_password(data: ChechEmailSchema, service: auth_depends) -> dict:
     data = data.model_dump()
@@ -225,30 +220,32 @@ async def forgot_password(data: ChechEmailSchema, service: auth_depends) -> dict
 
 
 @router.get(
-        "/forgot_password/{token}",
-        status_code=status.HTTP_200_OK,
-        responses={
-            200: {"description": "User Verify Successfilly"},
-            405: {"description": "Metod Not Allow"},
-            500: {"description": "Internal Server Error"},
-        }
-    )
+    "/forgot_password/{token}",
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "User Verify Successfilly"},
+        405: {"description": "Metod Not Allow"},
+        500: {"description": "Internal Server Error"},
+    },
+)
 async def check_user_verify(token: str, service: auth_depends) -> dict:
     service_action = await service.user_verify_handler(token=token)
     return service_action
 
 
 @router.post(
-        "/forgot_password/change",
-        status_code=status.HTTP_200_OK,
-        responses={
-            400: {"description": "Time expired"},
-            401: {"description": "Password Doesn`t Match"},
-            405: {"description": "Metod Not Allow"},
-            500: {"description": "Internal Servet Error"}
-        }
+    "/forgot_password/change",
+    status_code=status.HTTP_200_OK,
+    responses={
+        400: {"description": "Time expired"},
+        401: {"description": "Password Doesn`t Match"},
+        405: {"description": "Metod Not Allow"},
+        500: {"description": "Internal Servet Error"},
+    },
 )
-async def change_password(data: ChangePassword, request: Request, response: Response, service: auth_depends) -> TokenSchema:
+async def change_password(
+    data: ChangePassword, request: Request, response: Response, service: auth_depends
+) -> TokenSchema:
     data = data.model_dump()
     data["user_agent"] = request.headers.get("User-Agent")
     service_action = await service.change_password_handler(data=data)
@@ -268,7 +265,7 @@ async def change_password(data: ChangePassword, request: Request, response: Resp
     responses={
         405: {"description": "Metod Not Allow"},
         500: {"description": "Internal server error"},
-        },
+    },
 )
 async def logout(request: Request, service: auth_depends):
     refresh_token = request.cookies.get("refresh_token")

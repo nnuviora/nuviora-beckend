@@ -18,7 +18,7 @@ class AuthService(Protocol):
         email_manager,
         security_layer,
         error_handler,
-        template_handler
+        template_handler,
     ) -> None:
         self.user_repo: AbstractRepository = user_repo()
         self.refresh_repo: AbstractRepository = refresh_repo()
@@ -38,14 +38,23 @@ class AuthService(Protocol):
         except Exception:
             raise self.error_handler(status_code=504, detail="Gateway Timeout")
 
-    async def _generate_verification_token(self, data: dict, context: dict, template: str = "verify_email_template.html", exp: int = None) -> str:
+    async def _generate_verification_token(
+        self,
+        data: dict,
+        template: str = "verify_email_template.html",
+        exp: int = None,
+    ) -> str:
         try:
             token = str(random.randint(100000, 999999))
-            html_page = await self.template_handler(template_name=template, context={**context, "code": token})
+            html_page = await self.template_handler(
+                template_name=template, context={"year": datetime.now().year, "code": token}
+            )
             if not data.get("count"):
                 data["count"] = 0
             cache_data = await self.cache_manager.set(token=token, data=data, exp=exp)
-            await self.cache_manager.set(token=str(data.get("id")), data=cache_data, exp=exp)
+            await self.cache_manager.set(
+                token=str(data.get("id")), data=cache_data, exp=exp
+            )
             await self.send_mail(
                 recipient=data.get("email"),
                 subject="Email Verification",
@@ -53,7 +62,6 @@ class AuthService(Protocol):
             )
             return token
         except Exception as e:
-            print(e)
             raise e
 
     async def resend_email(self, user_id: uuid.UUID):
@@ -62,23 +70,23 @@ class AuthService(Protocol):
             data = await self.cache_manager.get(token=token)
 
             if not data:
-                raise self.error_handler(status_code=400, detail="Email verification token has expired")
+                raise self.error_handler(
+                    status_code=400, detail="Email verification token has expired"
+                )
 
             await asyncio.gather(
                 self.cache_manager.delete(token=token),
                 self.cache_manager.delete(token=str(user_id)),
             )
-            
+
             if data.get("count") >= 3:
                 raise self.error_handler(status_code=429, detail="Too Many Request")
-            
+
             data["count"] += 1
-            ############################################################################
-            new_token = await self._generate_verification_token(data, exp=180, context={
-                    "title": "Скидання пароля | Nuviora",
-                    "year": datetime.now().year
-                })
-            ############################################################################
+            new_token = await self._generate_verification_token(
+                data,
+                exp=180
+            )
             return {"message": "Message send", "id": user_id}
         except self.error_handler as e:
             raise e
@@ -104,10 +112,10 @@ class AuthService(Protocol):
                     password=data.get("hash_password")
                 )
                 data.pop("repeat_password")
-                token = await self._generate_verification_token(data=data, exp=180, context={
-                    "title": "Підтвердження Реєстрації",
-                    "year": datetime.now().year
-                })
+                token = await self._generate_verification_token(
+                    data=data,
+                    exp=180
+                )
                 return {"message": "Message sent", "id": data.get("id")}
 
             user_obj = await self.user_repo.get(email=data.get("email"))
@@ -121,15 +129,16 @@ class AuthService(Protocol):
                         "auth_type": data.get("auth_type"),
                     }
                 )
-            return await self._generate_token_pair(data=user_obj, user_agent=data.get("user_agent"))
+            return await self._generate_token_pair(
+                data=user_obj, user_agent=data.get("user_agent")
+            )
         except self.error_handler as e:
             raise e
         except Exception as e:
+            print(e)
             raise self.error_handler(status_code=500, detail="Internal Server Error")
 
-    async def _generate_token_pair(
-        self, data: dict, user_agent: Optional[str]
-    ) -> dict:
+    async def _generate_token_pair(self, data: dict, user_agent: Optional[str]) -> dict:
         try:
             access_token = await self.security_layer.create_access_token(
                 data={"id": str(data.get("id"))}
@@ -162,7 +171,9 @@ class AuthService(Protocol):
         try:
             user_obj = await self.cache_manager.get(token=data.get("token"))
             if not data:
-                raise self.error_handler(status_code=400, detail="Email verification token has expired")
+                raise self.error_handler(
+                    status_code=400, detail="Email verification token has expired"
+                )
 
             user_obj.pop("count")
             user_obj = await self.user_repo.insert(data=user_obj)
@@ -174,13 +185,13 @@ class AuthService(Protocol):
             raise e
         except Exception as e:
             raise self.error_handler(status_code=500, detail="Internal Server Error")
-        
+
     async def user_verify_handler(self, token: str):
         try:
             data = await self.cache_manager.get(token=token)
             if not data:
                 raise self.error_handler()
-            
+
             await self.cache_manager.delete(token=token)
             await self.cache_manager.set(token=token, data=data, exp=180)
             await self.cache_manager.set(token=str(data.get("id")), data=token, exp=180)
@@ -194,34 +205,41 @@ class AuthService(Protocol):
             if not user_obj:
                 raise self.error_handler(status_code=404, detail="User not found")
 
-            token = await self._generate_verification_token(data=user_obj, exp=180, context={
-                    "title": "Скидання пароля | Nuviora",
-                    "year": datetime.now().year
-                })
+            token = await self._generate_verification_token(
+                data=user_obj,
+                exp=180
+            )
             return {"message": "Password reset email sent", "id": user_obj.get("id")}
         except self.error_handler as e:
             raise e
         except Exception as e:
             raise self.error_handler(status_code=500, detail="Internal Server Error")
-        
+
     async def change_password_handler(self, data: dict) -> dict:
-        try:            
+        try:
             if data.get("hash_password") != data.get("repeat_password"):
                 raise self.error_handler(
                     status_code=401, detail="Password Doesn`t Match"
                 )
-            
+
             token = await self.cache_manager.get(token=str(data.get("id")))
             user_obj = await self.cache_manager.get(token=token)
 
             if not user_obj:
                 raise self.error_handler(status_code=400, detail="Time expired")
 
-            user_obj = await self.user_repo.update(id=user_obj.get("id"), data={
-                "update_at": datetime.now(),
-                "hash_password": await self.security_layer.hash_password(password=data.get("hash_password"))
-            })
-            return await self._generate_token_pair(data=user_obj, user_agent=data.get("user_agent"))            
+            user_obj = await self.user_repo.update(
+                id=user_obj.get("id"),
+                data={
+                    "update_at": datetime.now(),
+                    "hash_password": await self.security_layer.hash_password(
+                        password=data.get("hash_password")
+                    ),
+                },
+            )
+            return await self._generate_token_pair(
+                data=user_obj, user_agent=data.get("user_agent")
+            )
         except self.error_handler as e:
             raise e
         except Exception as e:
@@ -239,7 +257,9 @@ class AuthService(Protocol):
                 raise self.error_handler(
                     status_code=401, detail="Invalid username or password"
                 )
-            return await self._generate_token_pair(data=user_obj, user_agent=data.get("user_agent"))
+            return await self._generate_token_pair(
+                data=user_obj, user_agent=data.get("user_agent")
+            )
         except self.error_handler as e:
             raise e
         except Exception as e:
@@ -247,15 +267,20 @@ class AuthService(Protocol):
 
     async def recreate_access_handler(self, data: dict) -> dict:
         try:
-            payload = await self.security_layer.decode_token(token=data.get("refresh_token"))
+            payload = await self.security_layer.decode_token(
+                token=data.get("refresh_token")
+            )
             if not payload:
                 return self.error_handler(status_code=401, detail="Unauthorized")
 
             user_obj = await self.user_repo.get(id=payload.get("id"))
             if not user_obj:
                 return self.error_handler(status_code=404, detail="User not found")
-            
-            return await self._generate_token_pair(data=payload, user_agent=data.get("user_agent"))
+
+            await self.refresh_repo.delete(refresh_token=data.get("refresh_token"))
+            return await self._generate_token_pair(
+                data=payload, user_agent=data.get("user_agent")
+            )
         except self.error_handler as e:
             raise e
         except Exception as e:

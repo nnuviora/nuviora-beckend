@@ -23,7 +23,7 @@ async def auth_dep() -> AuthService:
         email_manager=MetaUaSender,
         security_layer=JWTAuth,
         error_handler=HTTPException,
-        template_handler=get_template
+        template_handler=get_template,
     )
 
 
