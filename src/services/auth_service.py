@@ -47,7 +47,8 @@ class AuthService(Protocol):
         try:
             token = str(random.randint(100000, 999999))
             html_page = await self.template_handler(
-                template_name=template, context={"year": datetime.now().year, "code": token}
+                template_name=template,
+                context={"year": datetime.now().year, "code": token},
             )
             if not data.get("count"):
                 data["count"] = 0
@@ -83,10 +84,7 @@ class AuthService(Protocol):
                 raise self.error_handler(status_code=429, detail="Too Many Request")
 
             data["count"] += 1
-            new_token = await self._generate_verification_token(
-                data,
-                exp=180
-            )
+            new_token = await self._generate_verification_token(data, exp=180)
             return {"message": "Message send", "id": user_id}
         except self.error_handler as e:
             raise e
@@ -112,10 +110,7 @@ class AuthService(Protocol):
                     password=data.get("hash_password")
                 )
                 data.pop("repeat_password")
-                token = await self._generate_verification_token(
-                    data=data,
-                    exp=180
-                )
+                token = await self._generate_verification_token(data=data, exp=180)
                 return {"message": "Message sent", "id": data.get("id")}
 
             user_obj = await self.user_repo.get(email=data.get("email"))
@@ -205,10 +200,7 @@ class AuthService(Protocol):
             if not user_obj:
                 raise self.error_handler(status_code=404, detail="User not found")
 
-            token = await self._generate_verification_token(
-                data=user_obj,
-                exp=180
-            )
+            token = await self._generate_verification_token(data=user_obj, exp=180)
             return {"message": "Password reset email sent", "id": user_obj.get("id")}
         except self.error_handler as e:
             raise e
