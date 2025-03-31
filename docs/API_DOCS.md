@@ -34,6 +34,7 @@ Follow these steps to set up the API locally:
   - `400 Bad Request`: Passwords do not match.
   - `405 Metod Not Allow`: Metod Not Allowed.
   - `409 Conflict`: Email is already in use.
+  - `422 Unprocessable Entity`: Invalid password.
   - `500 Internal Server Error`: Internal Server Error.
   - `504 External Service Is Not Responding`: Gateway Timeout.
 
