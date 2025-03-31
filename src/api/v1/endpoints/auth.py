@@ -63,7 +63,7 @@ async def verify_email(
         secure=False,
         samesite="strict",
     )
-    return {"access_token": service_action["access_token"]}
+    return {"access_token": service_action.get("access_token"), "user": service_action.get("user")}
 
 
 @router.post(
@@ -88,7 +88,7 @@ async def login(
         secure=False,
         samesite="strict",
     )
-    return service_action
+    return {"access_token": service_action.get("access_token"), "user": service_action.get("user")}
 
 
 @router.get(
@@ -256,7 +256,7 @@ async def change_password(
         secure=False,
         samesite="strict",
     )
-    return service_action
+    return {"access_token": service_action.get("access_token"), "user": service_action.get("user")}
 
 
 @router.get(

@@ -172,9 +172,11 @@ class AuthService(Protocol):
             user_obj.pop("count")
             user_obj = await self.user_repo.insert(data=user_obj)
             await self.cache_manager.delete(token=data.get("token"))
-            return await self._generate_token_pair(
+            token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )
+            token_pair["user"] = user_obj
+            return token_pair
         except self.error_handler as e:
             raise e
         except Exception as e:
@@ -228,9 +230,11 @@ class AuthService(Protocol):
                     ),
                 },
             )
-            return await self._generate_token_pair(
+            token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )
+            token_pair["user"] = user_obj
+            return token_pair
         except self.error_handler as e:
             raise e
         except Exception as e:
@@ -248,9 +252,12 @@ class AuthService(Protocol):
                 raise self.error_handler(
                     status_code=401, detail="Invalid username or password"
                 )
-            return await self._generate_token_pair(
+            
+            token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )
+            token_pair["user"] = user_obj
+            return token_pair
         except self.error_handler as e:
             raise e
         except Exception as e:
