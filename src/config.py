@@ -46,10 +46,21 @@ class ConfigSettings(BaseSettings):
     ACCESS_KEY: str
     SECRET_ACCESS_KEY: str
 
-    model_config = SettingsConfigDict(
-        env_file="../.env",
-        env_file_encoding="utf-8",
-    )
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM: str
+    MAIL_PORT: int
+    MAIL_SERVER: str
+
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    GOOGLE_REDIRECT_URI: str
+
+    GOOGLE_AUTH_URL: str
+    GOOGLE_TOKEN_URL: str
+    GOOGLE_USERINFO_URL: str
+
+    model_config = SettingsConfigDict(env_file="../.env", env_file_encoding="utf-8")
 
 
 config_setting = ConfigSettings()

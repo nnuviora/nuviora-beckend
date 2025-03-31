@@ -21,7 +21,7 @@ class UserModel(Base):
         index=True,
     )
     auth_type: Mapped[str] = mapped_column(nullable=True)
-    username: Mapped[str] = mapped_column()
+    username: Mapped[str] = mapped_column(nullable=True)
     email: Mapped[str] = mapped_column(unique=True)
     first_name: Mapped[str] = mapped_column(nullable=True)
     last_name: Mapped[str] = mapped_column(nullable=True)

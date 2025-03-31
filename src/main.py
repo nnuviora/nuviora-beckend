@@ -20,7 +20,11 @@ def get_application() -> FastAPI:
 
     application.add_event_handler("startup", startup)
 
-    origins = []
+    origins = [
+        "https://nuviora.vercel.app",
+        "https://nuviora-frontend-git-dev-nnuvioras-projects.vercel.app",
+        "http://localhost:3000"
+    ]
 
     application.add_middleware(
         CORSMiddleware,

@@ -60,13 +60,13 @@ class SqlLayer(AbstractRepository):
             try:
                 stmt = select(self.model).filter_by(**kwargs)
                 res = await session.execute(stmt)
-                obj = res.scalar_one_or_none()
-                if obj is None:
+                res = res.scalar_one_or_none()
+                if res is None:
                     return False
                 get_logger().info(
                     f"DATA GET: {self.model.__name__} with data: {args}, {kwargs}"
                 )
-                return await obj.to_dict()
+                return await res.to_dict()
             except Exception as e:
                 get_logger().info(
                     f"DATA NOT GET: {self.model.__name__} with data: {args}, {kwargs}"
@@ -115,7 +115,7 @@ class SqlLayer(AbstractRepository):
                 get_logger().info(
                     f"DATA UPDATED: {self.model.__name__} with data: {data}, {args}, {kwargs}"
                 )
-                return res
+                return await res.to_dict()
             except Exception as e:
                 await session.rollback()
                 get_logger().info(
