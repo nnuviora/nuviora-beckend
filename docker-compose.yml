@@ -44,8 +44,6 @@ services:
       REDIS_URL: redis://redis:6379
     ports:
       - "8000:8000"
-    volumes:
-      - ./src:/app
     depends_on:
       db:
         condition: service_healthy
