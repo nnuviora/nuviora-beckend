@@ -15,7 +15,10 @@ class AbstractEmail(ABC):
 
     @abstractmethod
     async def send_email(
-        self, recipient: str, subject: str, body_text: Optional[str] = None
+        self,
+        recipient: str,
+        subject: str,
+        body_text: Optional[str] = None,
     ):
         pass
 
@@ -39,7 +42,10 @@ class MetaUaSender(AbstractEmail):
         self.fm = FastMail(self.conf)
 
     async def send_email(
-        self, recipient: str, subject: str, body_text: Optional[str] = None
+        self,
+        recipient: str,
+        subject: str,
+        body_text: Optional[str] = None,
     ):
         try:
             message = MessageSchema(

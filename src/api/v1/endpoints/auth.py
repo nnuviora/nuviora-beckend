@@ -24,6 +24,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 auth_depends = Annotated[AuthService, Depends(auth_dep)]
 
 
+
 @router.post(
     "/register",
     status_code=status.HTTP_201_CREATED,
@@ -76,7 +77,10 @@ async def verify_email(
     },
 )
 async def login(
-    service: auth_depends, data: LoginSchema, request: Request, response: Response
+    service: auth_depends, 
+    data: LoginSchema, 
+    request: Request, 
+    response: Response
 ) -> TokenSchema:
     data = data.model_dump()
     data["user_agent"] = request.headers.get("User-Agent")

@@ -1,16 +1,17 @@
 from typing import Annotated
-
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException
 
 from services.auth_service import AuthService
-from repositories.user_repo import UserRepository, TokenRepository
+from services.user_service import UserService
+from repositories.user_repo import UserRepository,TokenRepository
 from core.security import JWTAuth
 from utils.cache_manager import RedisManager
 from utils.template_render import get_template
 
 # from utils.email_manager import AwsSender
 from utils.email_manager import MetaUaSender
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -26,12 +27,16 @@ async def auth_dep() -> AuthService:
         template_handler=get_template,
     )
 
-
+  
 # email_manager=AwsSender,
+
+async def user_dep()-> UserService:
+    return UserService(user_repo=UserRepository, error_handler=HTTPException)
 
 
 async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)], service=Depends(auth_dep)
+    token: Annotated[str, Depends(oauth2_scheme)],
+    service=Depends(auth_dep),
 ):
     payload = await service.security_layer.decode_token(token=token)
     if not payload:

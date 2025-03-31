@@ -23,7 +23,12 @@ class AbstractRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(self, data: dict, *args: Any, **kwargs: Any) -> dict:
+    async def update(
+        self,
+        data: dict,
+        *args: Any,
+        **kwargs: Any,
+    ) -> dict:
         pass
 
     @abstractmethod
@@ -85,7 +90,12 @@ class SqlLayer(AbstractRepository):
                     f"Get-all Error in {self.model.__class__.__name__}: {e}"
                 )
 
-    async def update(self, data: dict, *args: Any, **kwargs: Any) -> dict:
+    async def update(
+        self,
+        data: dict,
+        *args: Any,
+        **kwargs: Any,
+    ) -> dict:
         async with async_session_maker() as session:
             try:
                 stmt = await session.execute(select(self.model).filter_by(**kwargs))
@@ -94,7 +104,10 @@ class SqlLayer(AbstractRepository):
                 if not res:
                     return False
 
-                for key, value in data.items():
+                for (
+                    key,
+                    value,
+                ) in data.items():
                     setattr(res, key, value)
 
                 await session.commit()
