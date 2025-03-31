@@ -28,6 +28,7 @@ Follow these steps to set up the API locally:
     "repeat_password": "Password123!"
   }
   ```
+- **P.S. Password must be containes 4 number, 1 lower symbol and 1 upper symbol**
   
 - **Response Codes:**
   - `201 Created`: Registration successful.
