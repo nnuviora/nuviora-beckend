@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr, field_validator
 
 
 class LoginSchema(BaseModel):
-    login: str
+    email: str
     password: str
 
 

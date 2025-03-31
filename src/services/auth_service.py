@@ -102,7 +102,7 @@ class AuthService(Protocol):
 
                 if data.get("hash_password") != data.get("repeat_password"):
                     raise self.error_handler(
-                        status_code=409, detail="Password doesn`t match"
+                        status_code=400, detail="Password doesn`t match"
                     )
 
                 data["id"] = uuid.uuid4()
@@ -130,7 +130,6 @@ class AuthService(Protocol):
         except self.error_handler as e:
             raise e
         except Exception as e:
-            print(e)
             raise self.error_handler(status_code=500, detail="Internal Server Error")
 
     async def _generate_token_pair(self, data: dict, user_agent: Optional[str]) -> dict:
@@ -239,7 +238,7 @@ class AuthService(Protocol):
 
     async def login_handler(self, data: dict) -> dict:
         try:
-            user_obj = await self.user_repo.get(email=data.get("login"))
+            user_obj = await self.user_repo.get(email=data.get("email"))
             if not user_obj or not (
                 await self.security_layer.verify_password(
                     password=data.get("password"),

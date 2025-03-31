@@ -32,7 +32,10 @@ Follow these steps to set up the API locally:
 - **Response Codes:**
   - `201 Created`: Registration successful.
   - `400 Bad Request`: Passwords do not match.
+  - `405 Metod Not Allow`: Metod Not Allowed.
   - `409 Conflict`: Email is already in use.
+  - `500 Internal Server Error`: Internal Server Error.
+  - `504 External Service Is Not Responding`: Gateway Timeout.
 
 ### 2. Verify Email
 
@@ -46,6 +49,8 @@ Follow these steps to set up the API locally:
 - **Response Codes:**
   - `200 OK`: Email verified successfully.
   - `400 Bad Request`: Token has expired.
+  - `405 Metod Not Allow`: Metod Not Allowed.
+  - `500 Internal Server Error`: Internal Server Error.
 
 ### 3. Login
 
@@ -56,7 +61,7 @@ Follow these steps to set up the API locally:
 
   ```json
   {
-    "login": "user@example.com",
+    "email": "user@example.com",
     "password": "Password123!"
   }
   ```
@@ -64,6 +69,8 @@ Follow these steps to set up the API locally:
 - **Response Codes:**
   - `200 OK`: Login successful.
   - `401 Unauthorized`: Incorrect username or password.
+  - `405 Metod Not Allow`: Metod Not Allowed.
+  - `500 Internal Server Error`: Internal Server Error.
 
 ### 4. Resend Email Verification
 
@@ -77,7 +84,10 @@ Follow these steps to set up the API locally:
 - **Response Codes:**
   - `200 OK`: Verification email resent.
   - `400 Bad Request`: Email verification token expired.
+  - `405 Metod Not Allow`: Metod Not Allowed.
   - `429 Too Many Requests`: Request limit exceeded.
+  - `500 Internal Server Error`: Internal Server Error.
+  - `504 External Service Is Not Responding`: Gateway Timeout.
 
 ### 5. Google Authentication URL
 
@@ -86,6 +96,8 @@ Follow these steps to set up the API locally:
 - **Description:** Generates a URL for Google OAuth.
 - **Response Codes:**
   - `200 OK`: Google OAuth URL generated successfully.
+  - `405 Metod Not Allow`: Metod Not Allowed.
+  - `500 Internal Server Error`: Internal Server Error.
 
 ### 6. Refresh Access Token
 
@@ -96,6 +108,9 @@ Follow these steps to set up the API locally:
 - **Response Codes:**
   - `200 OK`: Access token refreshed.
   - `401 Unauthorized`: Unauthorized access.
+  - `404 Not Found`: User not found.
+  - `405 Metod Not Allow`: Metod Not Allowed.
+  - `500 Internal Server Error`: Internal Server Error.
 
 ### 7. Forgot Password
 
@@ -113,6 +128,8 @@ Follow these steps to set up the API locally:
 - **Response Codes:**
   - `200 OK`: Password reset initiated.
   - `404 Not Found`: User not found.
+  - `405 Metod Not Allow`: Metod Not Allowed.
+  - `500 Internal Server Error`: Internal Server Error.
 
 ### 8. Verify User for Password Reset
 
@@ -125,6 +142,8 @@ Follow these steps to set up the API locally:
 
 - **Response Codes:**
   - `200 OK`: User verification successful.
+  - `405 Metod Not Allow`: Metod Not Allowed.
+  - `500 Internal Server Error`: Internal Server Error.
 
 ### 9. Change Password
 
@@ -144,6 +163,9 @@ Follow these steps to set up the API locally:
 - **Response Codes:**
   - `200 OK`: Password changed successfully.
   - `400 Bad Request`: Time expired or passwords do not match.
+  - `401 Unauthorized`: Password Doesn`t Match
+  - `405 Metod Not Allow`: Metod Not Allowed.
+  - `500 Internal Server Error`: Internal Server Error.
 
 ### 10. Logout
 
