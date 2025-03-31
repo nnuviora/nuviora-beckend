@@ -28,9 +28,9 @@ auth_depends = Annotated[AuthService, Depends(auth_dep)]
     "/register",
     status_code=status.HTTP_201_CREATED,
     responses={
+        400: {"description": "Password Doesn`t Match"},
         405: {"description": "Metod Not Allow"},
         409: {"description": "Email is already taken"},
-        400: {"description": "Password Doesn`t Match"},
         500: {"description": "Internal Server Error"},
         504: {"description": "External Service Is Not Responding"},
     },
