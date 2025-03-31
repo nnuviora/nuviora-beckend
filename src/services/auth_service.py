@@ -45,7 +45,7 @@ class AuthService(Protocol):
         exp: int = None,
     ) -> str:
         try:
-            token = str(random.randint(100000, 999999))
+            token = str(random.randint(1000, 9999))
             html_page = await self.template_handler(
                 template_name=template,
                 context={"year": datetime.now().year, "code": token},
