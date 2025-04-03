@@ -23,3 +23,13 @@ class UserBaseSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+
+class UserUpdateSchema(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone: Optional[str] = None
+    birth_date: Optional[str] = None

@@ -23,12 +23,7 @@ class AbstractRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(
-        self,
-        data: dict,
-        *args: Any,
-        **kwargs: Any,
-    ) -> dict:
+    async def update(self, data:dict, *args:Any, **kwargs:Any) -> dict:
         pass
 
     @abstractmethod
