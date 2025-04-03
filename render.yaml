@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: fastapi
+    env: docker
+    repo: https://github.com/nnuviora/nuviora-beckend
+    branch: dev  # або main
+    envVars:
+      - key: POSTGRES_USER
+        sync: false
+      - key: POSTGRES_PASSWORD
+        sync: false
+      - key: POSTGRES_DB
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  - type: web
+    name: nginx
+    env: docker
+    repo: https://github.com/nnuviora/nuviora-beckend
+    branch: dev
