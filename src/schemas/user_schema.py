@@ -17,8 +17,18 @@ class UserBaseSchema(BaseModel):
     address: Optional[Union[dict, int]] = Field(default=False)
     created_at: Optional[datetime] = Field(default=None)
     updated_at: Optional[datetime] = Field(default=None)
-    is_activate: bool = Field(default=False)
-    is_locked: bool = Field(default=False)
+    is_activate: Optional[bool] = Field(default=False)
+    is_locked: Optional[bool] = Field(default=False)
 
     class Config:
         from_attributes = True
+
+
+
+class UserUpdateSchema(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone: Optional[str] = None
+    birth_date: Optional[str] = None
