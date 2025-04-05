@@ -5,7 +5,6 @@ from typing import Optional, Union
 from pydantic import BaseModel, Field, EmailStr
 
 
-
 class UserBaseSchema(BaseModel):
     id: Optional[uuid.UUID] = Field(default=False)
     usename: Optional[str] = Field(default=None)

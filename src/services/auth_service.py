@@ -252,7 +252,7 @@ class AuthService(Protocol):
                 raise self.error_handler(
                     status_code=401, detail="Invalid username or password"
                 )
-            
+
             token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )
@@ -269,11 +269,11 @@ class AuthService(Protocol):
                 token=data.get("refresh_token")
             )
             if not payload:
-                return self.error_handler(status_code=401, detail="Unauthorized")
+                raise self.error_handler(status_code=401, detail="Unauthorized")
 
             user_obj = await self.user_repo.get(id=payload.get("id"))
             if not user_obj:
-                return self.error_handler(status_code=404, detail="User not found")
+                raise self.error_handler(status_code=404, detail="User not found")
 
             await self.refresh_repo.delete(refresh_token=data.get("refresh_token"))
             return await self._generate_token_pair(

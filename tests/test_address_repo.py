@@ -8,7 +8,6 @@ sys.modules["src.models.user_model"].UserModel = MagicMock()
 from src.repositories.user_repo import AddressRepository
 
 
-
 @pytest.fixture
 def mock_user():
     mock_user = MagicMock()

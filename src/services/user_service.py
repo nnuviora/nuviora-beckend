@@ -13,7 +13,7 @@ class UserService(Protocol):
             user_info_dict = await self.user_repo.get(id=uuid)
             print(user_info_dict)
             if not user_info_dict:
-                raise self.error_handler(status_code = 404, detail="User not found")
+                raise self.error_handler(status_code=404, detail="User not found")
             return user_info_dict
         except self.error_handler as e:
             raise e
