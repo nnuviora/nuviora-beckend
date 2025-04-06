@@ -1,4 +1,4 @@
-name: Deploy to EC2 on Dev Update
+name: Deploy Docker App to EC2
 
 on:
   push:
@@ -20,11 +20,14 @@ jobs:
           chmod 600 ~/.ssh/aws_key.pem
           ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Copy files to EC2
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/aws_key.pem" ./ ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
+
       - name: Deploy via SSH
         run: |
           ssh -i ~/.ssh/aws_key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
-            cd /home/ubuntu/my-app  # змінити на твій шлях
-            git pull origin dev
-            npm install             # або pip install, залежно від проекту
-            pm2 restart app         # або як ти запускаєш сервіс
+            cd /home/ubuntu/nuviora_backend
+            docker-compose down
+            docker-compose up --build -d
           EOF
