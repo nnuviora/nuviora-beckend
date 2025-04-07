@@ -19,24 +19,25 @@ jobs:
           echo "${{ secrets.AWS_KEY }}" > ~/.ssh/aws_key.pem
           chmod 600 ~/.ssh/aws_key.pem
           ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
+
       - name: Check if SRC folder has changed
         id: check_src
         run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^SRC/'; then
-            echo "SRC_CHANGED=true" >> $GITHUB_ENV
+          if git diff --name-only HEAD~1 HEAD | grep '^SRC/'; then
+            echo "changed=true" >> $GITHUB_OUTPUT
           else
-            echo "SRC_CHANGED=false" >> $GITHUB_ENV
+            echo "changed=false" >> $GITHUB_OUTPUT
           fi
-    
+
       - name: Copy files to EC2
-        if: env.SRC_CHANGED == 'true'
+        if: steps.check_src.outputs.changed == 'true'
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/aws_key.pem" ./ ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
+          rsync -avz -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
 
       - name: Deploy via SSH
-        if: env.SRC_CHANGED == 'true'
+        if: steps.check_src.outputs.changed == 'true'
         run: |
-          ssh -i ~/.ssh/aws_key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+          ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             cd /home/ubuntu/nuviora_backend
             docker-compose build fastapi
             docker-compose up -d fastapi
