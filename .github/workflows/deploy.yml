@@ -12,9 +12,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # <-- ключова зміна, щоб git diff працював
 
       - name: Debug changed files
-        run: git diff --name-only HEAD~1 HEAD
+        run: git diff --name-only HEAD~1 HEAD || echo "Diff failed"
 
       - name: Set up SSH
         run: |
@@ -26,17 +28,14 @@ jobs:
       - name: Check if SRC folder has changed
         id: check_src
         run: |
-          set -e
-          if git rev-parse HEAD~1 2>/dev/null; then
-            CHANGED=$(git diff --name-only HEAD~1 HEAD | grep '^SRC/' || true)
-          else
-            CHANGED="force_deploy"
-          fi
-
-          if [ -n "$CHANGED" ]; then
+          if [ $(git rev-list --count HEAD) -eq 1 ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
           else
-            echo "changed=false" >> $GITHUB_OUTPUT
+            if git diff --name-only HEAD~1 HEAD | grep '^SRC/'; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+            fi
           fi
 
       - name: Copy files to EC2
