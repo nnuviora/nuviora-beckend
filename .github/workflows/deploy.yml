@@ -20,9 +20,9 @@ jobs:
           chmod 600 ~/.ssh/aws_key.pem
           ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Copy all project files to EC2
+      - name: Copy all project files to EC2 (excluding problematic dirs)
         run: |
-          rsync -avz --delete --checksum -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ \
+          rsync -avz --exclude '__pycache__' --exclude '.git' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ \
             ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
 
       - name: Rebuild and restart fastapi container
@@ -32,9 +32,6 @@ jobs:
 
             echo "==> Stopping fastapi container..."
             docker-compose stop fastapi || true
-
-            echo "==> Removing old fastapi container..."
-            docker-compose rm -f fastapi || true
 
             echo "==> Rebuilding fastapi container with no cache..."
             docker-compose build --no-cache fastapi
