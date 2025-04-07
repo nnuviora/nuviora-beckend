@@ -13,10 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # <-- ключова зміна, щоб git diff працював
-
-      - name: Debug changed files
-        run: git diff --name-only HEAD~1 HEAD || echo "Diff failed"
+          fetch-depth: 2  # потрібно для git diff
 
       - name: Set up SSH
         run: |
@@ -43,11 +40,32 @@ jobs:
         run: |
           rsync -avz --delete --checksum -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
 
-      - name: Deploy fastapi container via SSH
+      - name: Debug file structure on EC2
+        if: steps.check_src.outputs.changed == 'true'
+        run: |
+          ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+            echo "==> Files in SRC:"
+            ls -l /home/ubuntu/nuviora_backend/SRC
+
+            echo "==> Recently modified files in SRC:"
+            find /home/ubuntu/nuviora_backend/SRC -type f -printf '%TY-%Tm-%Td %TH:%TM %p\n' | sort -r | head -5
+          EOF
+
+      - name: Rebuild and restart fastapi container
         if: steps.check_src.outputs.changed == 'true'
         run: |
           ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             cd /home/ubuntu/nuviora_backend
+
+            echo "==> Stopping fastapi container..."
+            docker-compose stop fastapi || true
+
+            echo "==> Removing old fastapi container..."
+            docker-compose rm -f fastapi || true
+
+            echo "==> Rebuilding fastapi container with no cache..."
             docker-compose build --no-cache fastapi
+
+            echo "==> Starting fastapi container..."
             docker-compose up -d fastapi
           EOF
