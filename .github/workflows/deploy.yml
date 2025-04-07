@@ -38,6 +38,6 @@ jobs:
         run: |
           ssh -i ~/.ssh/aws_key.pem ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             cd /home/ubuntu/nuviora_backend
-            docker-compose build fastapi_app
-            docker-compose up -d fastapi_app
+            docker-compose build fastapi
+            docker-compose up -d fastapi
           EOF
