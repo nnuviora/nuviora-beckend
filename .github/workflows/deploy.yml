@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Debug changed files
+        run: git diff --name-only HEAD~1 HEAD
+
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
@@ -32,13 +35,13 @@ jobs:
       - name: Copy files to EC2
         if: steps.check_src.outputs.changed == 'true'
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
+          rsync -avz --delete --checksum -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
 
-      - name: Deploy via SSH
+      - name: Deploy fastapi container via SSH
         if: steps.check_src.outputs.changed == 'true'
         run: |
           ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
             cd /home/ubuntu/nuviora_backend
-            docker-compose build fastapi
+            docker-compose build --no-cache fastapi
             docker-compose up -d fastapi
           EOF
