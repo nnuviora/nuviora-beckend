@@ -8,7 +8,6 @@ from api.routers import routers as api_routers
 from admin.routes import routers as view_routers
 
 
-
 def get_application() -> FastAPI:
 
     async def startup():
@@ -23,7 +22,7 @@ def get_application() -> FastAPI:
     origins = [
         "https://nuviora.vercel.app",
         "https://nuviora-frontend-git-dev-nnuvioras-projects.vercel.app",
-        "http://localhost:3000"
+        "http://localhost:3000",
     ]
 
     application.add_middleware(

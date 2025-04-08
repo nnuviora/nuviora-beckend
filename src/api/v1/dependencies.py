@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException
 
 from services.auth_service import AuthService
 from services.user_service import UserService
-from repositories.user_repo import UserRepository,TokenRepository
+from repositories.user_repo import UserRepository, TokenRepository
 from core.security import JWTAuth
 from utils.cache_manager import RedisManager
 from utils.template_render import get_template
@@ -27,11 +27,16 @@ async def auth_dep() -> AuthService:
         template_handler=get_template,
     )
 
-  
+
 # email_manager=AwsSender,
 
-async def user_dep()-> UserService:
-    return UserService(user_repo=UserRepository, error_handler=HTTPException)
+
+async def user_dep() -> UserService:
+    return UserService(
+        user_repo=UserRepository(),
+        error_handler=HTTPException,
+        token_repo=TokenRepository(),
+    )
 
 
 async def get_current_user(

@@ -252,7 +252,7 @@ class AuthService(Protocol):
                 raise self.error_handler(
                     status_code=401, detail="Invalid username or password"
                 )
-            
+
             token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )

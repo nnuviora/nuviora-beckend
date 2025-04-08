@@ -1,13 +1,11 @@
 import uuid
 from datetime import datetime
-
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
     relationship,
 )
 from sqlalchemy import ForeignKey
-
 from database import Base
 
 
@@ -44,6 +42,7 @@ class UserModel(Base):
     hash_password: Mapped[str] = mapped_column(nullable=True)
 
     role: Mapped["RoleModel"] = relationship(back_populates="user")
+
     token: Mapped["TokenModel"] = relationship(back_populates="user")
     address: Mapped["AddressModel"] = relationship(back_populates="user")
 
@@ -110,11 +109,9 @@ class TokenModel(Base):
         index=True,
     )
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey(
-            "users.id",
-            ondelete="CASCADE",
-        )
+        ForeignKey("users.id", ondelete="CASCADE"),
     )
+
     refresh_token: Mapped[str] = mapped_column(unique=True)
     expires_at: Mapped[datetime] = mapped_column()
     user_agent: Mapped[str] = mapped_column()
