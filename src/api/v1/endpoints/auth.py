@@ -1,11 +1,8 @@
 from typing import Annotated
 import uuid
-
 import httpx
-
 from fastapi.routing import APIRouter
 from fastapi import status, Depends, Request, Response, HTTPException
-
 from schemas.auth_schema import (
     LoginSchema,
     TokenSchema,
@@ -15,14 +12,12 @@ from schemas.auth_schema import (
 )
 from services.auth_service import AuthService
 from api.v1.dependencies import auth_dep
-
 from config import config_setting
 
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 auth_depends = Annotated[AuthService, Depends(auth_dep)]
-
 
 
 @router.post(
@@ -46,25 +41,31 @@ async def register(service: auth_depends, data: RegisterSchema) -> dict:
 @router.get(
     "/verify_email/{token}",
     status_code=status.HTTP_200_OK,
-    responses={
-        400: {"description": "Email verification token has expired"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
-    },
+    # responses={
+    #     400: {"description": "Email verification token has expired"},
+    #     405: {"description": "Metod Not Allow"},
+    #     500: {"description": "Internal Server Error"},
+    # },
 )
 async def verify_email(
     service: auth_depends, token: str, request: Request, response: Response
 ) -> TokenSchema:
-    data = {"user_agent": request.headers.get("User-Agent"), "token": token}
-    service_action = await service.email_verify_handler(data=data)
-    response.set_cookie(
-        key="refresh_token",
-        value=service_action["refresh_token"],
-        httponly=True,
-        secure=False,
-        samesite="strict",
-    )
-    return {"access_token": service_action.get("access_token"), "user": service_action.get("user")}
+    try:
+        data = {"user_agent": request.headers.get("User-Agent"), "token": token}
+        service_action = await service.email_verify_handler(data=data)
+        response.set_cookie(
+            key="refresh_token",
+            value=service_action["refresh_token"],
+            httponly=True,
+            secure=False,
+            samesite="strict",
+        )
+        return {
+            "access_token": service_action.get("access_token"),
+            "user": service_action.get("user"),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
 @router.post(
@@ -77,10 +78,7 @@ async def verify_email(
     },
 )
 async def login(
-    service: auth_depends, 
-    data: LoginSchema, 
-    request: Request, 
-    response: Response
+    service: auth_depends, data: LoginSchema, request: Request, response: Response
 ) -> TokenSchema:
     data = data.model_dump()
     data["user_agent"] = request.headers.get("User-Agent")
@@ -92,7 +90,10 @@ async def login(
         secure=False,
         samesite="strict",
     )
-    return {"access_token": service_action.get("access_token"), "user": service_action.get("user")}
+    return {
+        "access_token": service_action.get("access_token"),
+        "user": service_action.get("user"),
+    }
 
 
 @router.get(
@@ -260,7 +261,10 @@ async def change_password(
         secure=False,
         samesite="strict",
     )
-    return {"access_token": service_action.get("access_token"), "user": service_action.get("user")}
+    return {
+        "access_token": service_action.get("access_token"),
+        "user": service_action.get("user"),
+    }
 
 
 @router.get(

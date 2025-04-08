@@ -1,12 +1,6 @@
-from datetime import (
-    timedelta,
-    datetime,
-    timezone,
-)
-
+from datetime import timedelta, datetime, timezone
 from passlib.context import CryptContext
 import jwt
-
 from config import config_setting
 
 

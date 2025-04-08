@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
-
 from sqlalchemy import select
-
 from database import async_session_maker
 from utils.logging import get_logger
 
@@ -23,7 +21,7 @@ class AbstractRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(self, data:dict, *args:Any, **kwargs:Any) -> dict:
+    async def update(self, data: dict, *args: Any, **kwargs: Any) -> dict:
         pass
 
     @abstractmethod
