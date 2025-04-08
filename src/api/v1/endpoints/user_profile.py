@@ -7,19 +7,22 @@ from schemas.user_schema import UserBaseSchema, UserUpdateSchema
 from api.v1.dependencies import get_current_user, user_dep
 
 
-router = APIRouter(prefix="/user", tags=["User Profile"])
+router = APIRouter(prefix="/profile", tags=["User Profile"])
+
 
 user_service_dep = Annotated[UserService, Depends(user_dep)]
 user_base_schema_dep = Annotated[UserBaseSchema, Depends(get_current_user)]
 
 
-@router.get("/{uuid}", status_code=status.HTTP_200_OK)
-async def get_one_user(uuid: str, user_service: user_service_dep) -> UserBaseSchema:
-    try:
-        user_data = await user_service.get_one_user(uuid)
-        return user_data
-    except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+
+@router.get("/me", status_code=status.HTTP_200_OK,
+            responses={
+            401: {"description": "Unauthorized: Invalid or missing token"},
+            500: {"description": "Internal Server Error"},
+            },
+            )
+async def profile(user: user_base_schema_dep) -> UserBaseSchema:
+    return user
 
 
 @router.delete(
