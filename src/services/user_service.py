@@ -41,7 +41,7 @@ class UserService(Protocol):
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise Exception(f"User to delete not found")
+            raise Exception(f"User to delete not found {e}")
 
     async def update_user(self, user_id: uuid.UUID, update_data: dict):
 

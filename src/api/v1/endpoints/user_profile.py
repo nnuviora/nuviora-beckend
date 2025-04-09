@@ -14,13 +14,14 @@ user_service_dep = Annotated[UserService, Depends(user_dep)]
 user_base_schema_dep = Annotated[UserBaseSchema, Depends(get_current_user)]
 
 
-
-@router.get("/me", status_code=status.HTTP_200_OK,
-            responses={
-            401: {"description": "Unauthorized: Invalid or missing token"},
-            500: {"description": "Internal Server Error"},
-            },
-            )
+@router.get(
+    "/me",
+    status_code=status.HTTP_200_OK,
+    responses={
+        401: {"description": "Unauthorized: Invalid or missing token"},
+        500: {"description": "Internal Server Error"},
+    },
+)
 async def profile(user: user_base_schema_dep) -> UserBaseSchema:
     return user
 
