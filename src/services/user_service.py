@@ -10,6 +10,7 @@ class UserService(Protocol):
         self.error_handler = error_handler
         self.token_repo: TokenRepository = token_repo
 
+
     async def get_one_user(self, user_id: str) -> dict:
         try:
             user_info_dict = await self.user_repo.get(id=user_id)
@@ -20,7 +21,8 @@ class UserService(Protocol):
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise Exception(f"User not found {self.get_one_user}: {e}")
+            raise Exception(f"The user cannot be found")
+        
 
     async def delete_one_user(self, uuid):
         try:
@@ -41,7 +43,7 @@ class UserService(Protocol):
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise Exception(f"User to delete not found {e}")
+            raise Exception(f"User to delete not found")
 
     async def update_user(self, user_id: uuid.UUID, update_data: dict):
 
