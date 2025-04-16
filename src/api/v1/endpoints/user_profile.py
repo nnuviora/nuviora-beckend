@@ -13,8 +13,6 @@ one_user_dependencies = Annotated[UserService, Depends(user_dep)]
 current_user_dep = Annotated[UserBaseSchema, Depends(get_current_user)]
 
 
-
-
 @router.get("/{uuid}", status_code=status.HTTP_200_OK)
 async def get_one_user(
     uuid: str, user_service: one_user_dependencies

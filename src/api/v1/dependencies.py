@@ -35,13 +35,16 @@ async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
     service=Depends(auth_dep),
 ):
-    payload = await service.security_layer.decode_token(token=token)
-    if not payload:
-        raise Exception("Invalid Token")
+    try:
+        payload = await service.security_layer.decode_token(token=token)
+        if not payload:
+            raise HTTPException(status_code=401, detail="Unauthorized")
 
-    user_id = payload.get("id")
+        user_id = payload.get("id")
 
-    user = await service.user_repo.get(id=user_id)
-    if user is None or user is False:
-        raise Exception("User not found")
-    return user
+        user = await service.user_repo.get(id=user_id)
+        if user is None or user is False:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Unauthorized")

@@ -58,10 +58,13 @@ async def verify_email(
     service_action = await service.email_verify_handler(data=data)
     response.set_cookie(
         key="refresh_token",
-        value=service_action["refresh_token"],
+        value=service_action.get("refresh_token"),
+        path="/",
         httponly=True,
-        secure=False,
-        samesite="strict",
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        domain="nuviora.click"
     )
     return {
         "access_token": service_action.get("access_token"),
@@ -73,7 +76,7 @@ async def verify_email(
     "/login",
     status_code=status.HTTP_200_OK,
     responses={
-        401: {"description": "Invalid username or password"},
+        400: {"description": "Invalid username or password"},
         405: {"description": "Metod Not Allow"},
         500: {"description": "Internal Server error"},
     },
@@ -87,9 +90,12 @@ async def login(
     response.set_cookie(
         key="refresh_token",
         value=service_action.get("refresh_token"),
+        path="/",
         httponly=True,
-        secure=False,
-        samesite="strict",
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        domain="nuviora.click"
     )
     return {
         "access_token": service_action.get("access_token"),
@@ -175,9 +181,12 @@ async def auth_callback(
         response.set_cookie(
             key="refresh_token",
             value=service_action.get("refresh_token"),
+            path="/",
             httponly=True,
-            secure=False,
-            samesite="strict",
+            secure=True,
+            samesite="none",
+            max_age=7*24*60*60,
+            domain="nuviora.click"
         )
     return service_action
 
@@ -203,9 +212,12 @@ async def refresh_access(
     response.set_cookie(
         key="refresh_token",
         value=service_action.get("refresh_token"),
+        path="/",
         httponly=True,
-        secure=False,
-        samesite="strict",
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        domain="nuviora.click"
     )
     return service_action
 
@@ -251,21 +263,21 @@ async def check_user_verify(token: str, service: auth_depends) -> dict:
 )
 async def change_password(
     data: ChangePassword, request: Request, response: Response, service: auth_depends
-) -> TokenSchema:
+) -> dict:
     data = data.model_dump()
     data["user_agent"] = request.headers.get("User-Agent")
     service_action = await service.change_password_handler(data=data)
     response.set_cookie(
         key="refresh_token",
         value=service_action.get("refresh_token"),
+        path="/",
         httponly=True,
-        secure=False,
-        samesite="strict",
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        domain="nuviora.click"
     )
-    return {
-        "access_token": service_action.get("access_token"),
-        "user": service_action.get("user"),
-    }
+    return service_action
 
 
 @router.get(
@@ -279,7 +291,13 @@ async def change_password(
 async def logout(request: Request, response: Response, service: auth_depends):
     refresh_token = request.cookies.get("refresh_token")
     service_action = await service.logout_handler(refresh_token=refresh_token)
-    response.delete_cookie("refresh_token", path="/", httponly=True, samesite="lax")
+    response.delete_cookie(
+        key="refresh_token",
+        path="/",
+        domain="nuviora.click",
+        samesite="none",
+        secure=True
+    )
     return service_action
 
 

@@ -138,22 +138,17 @@ class AuthService(Protocol):
                 data={"id": str(data.get("id"))}
             )
 
-            refresh_token = await self.refresh_repo.get(
-                user_id=data.get("id"), user_agent=user_agent
+            refresh_token, expire = await self.security_layer.create_refresh_token(
+                data={"id": str(data.get("id"))}
             )
-
-            if not refresh_token:
-                refresh_token, expire = await self.security_layer.create_refresh_token(
-                    data={"id": str(data.get("id"))}
-                )
-                refresh_token = await self.refresh_repo.insert(
-                    data={
-                        "user_id": data.get("id"),
-                        "refresh_token": refresh_token,
-                        "user_agent": user_agent,
-                        "expires_at": expire,
-                    }
-                )
+            refresh_token = await self.refresh_repo.insert(
+                data={
+                    "user_id": data.get("id"),
+                    "refresh_token": refresh_token,
+                    "user_agent": user_agent,
+                    "expires_at": expire,
+                }
+            )
             return {
                 "access_token": access_token,
                 "refresh_token": refresh_token.get("refresh_token"),
@@ -175,7 +170,6 @@ class AuthService(Protocol):
             token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )
-            token_pair["user"] = user_obj
             return token_pair
         except self.error_handler as e:
             raise e
@@ -233,8 +227,7 @@ class AuthService(Protocol):
             token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )
-            token_pair["user"] = user_obj
-            return token_pair
+            return {"message": "Password changed succefully"}
         except self.error_handler as e:
             raise e
         except Exception as e:
@@ -250,13 +243,12 @@ class AuthService(Protocol):
                 )
             ):
                 raise self.error_handler(
-                    status_code=401, detail="Invalid username or password"
+                    status_code=400, detail="Invalid username or password"
                 )
 
             token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )
-            token_pair["user"] = user_obj
             return token_pair
         except self.error_handler as e:
             raise e
@@ -281,6 +273,8 @@ class AuthService(Protocol):
             )
         except self.error_handler as e:
             raise e
+        except ValueError:
+            raise self.error_handler(status_code=410, detail="Gone")
         except Exception as e:
             raise self.error_handler(status_code=500, detail="Internal Server Error")
 

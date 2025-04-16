@@ -47,6 +47,7 @@ class UserModel(Base):
     token: Mapped["TokenModel"] = relationship(back_populates="user")
     address: Mapped["AddressModel"] = relationship(back_populates="user")
 
+####################################################################################################
     async def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -63,7 +64,7 @@ class UserModel(Base):
             "is_locked": self.is_locked,
             "hash_password": self.hash_password,
         }
-
+####################################################################################################
 
 class AddressModel(Base):
     __tablename__ = "addresses"

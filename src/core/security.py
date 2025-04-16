@@ -83,4 +83,4 @@ class JWTAuth(SecurityBase):
             )
             return payload
         except Exception as e:
-            raise Exception(f"Decode Token Error in {self.decode_token.__name__}: {e}")
+            raise ValueError(f"Decode Token Error in {self.decode_token.__name__}: {e}")

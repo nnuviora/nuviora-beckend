@@ -54,5 +54,4 @@ class UserService(Protocol):
             raise e
         except Exception as e:
             raise Exception(f"User update failed: {e}")
-        
 

@@ -2,9 +2,7 @@ import uuid
 import re
 from typing import Union, Optional
 
-from pydantic import BaseModel, EmailStr, field_validator, Field
-
-from .user_schema import UserBaseSchema
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 class LoginSchema(BaseModel):
@@ -14,7 +12,6 @@ class LoginSchema(BaseModel):
 
 class TokenSchema(BaseModel):
     access_token: str
-    user: Optional[UserBaseSchema] = Field(default=None)
 
 
 class ForgotPassword(BaseModel):
