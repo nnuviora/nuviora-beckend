@@ -1,0 +1,41 @@
+name: Deploy Docker App to EC2
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_KEY }}" > ~/.ssh/aws_key.pem
+          chmod 600 ~/.ssh/aws_key.pem
+          ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Copy all project files to EC2 (excluding problematic dirs)
+        run: |
+          rsync -avz --exclude '__pycache__' --exclude '.git' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ \
+            ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
+
+      - name: Rebuild and restart fastapi container
+        run: |
+          ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} << 'EOF'
+            cd /home/ubuntu/nuviora_backend
+
+            echo "==> Stopping fastapi container..."
+            docker-compose stop fastapi || true
+
+            echo "==> Rebuilding fastapi container with no cache..."
+            docker-compose build --no-cache fastapi
+
+            echo "==> Starting fastapi container..."
+            docker-compose up -d fastapi
+          EOF

@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any
-
 from sqlalchemy import select
-
 from database import async_session_maker
 from utils.logging import get_logger
 
@@ -23,7 +21,7 @@ class AbstractRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(self, data:dict, *args:Any, **kwargs:Any) -> dict:
+    async def update(self, data: dict, *args: Any, **kwargs: Any) -> dict:
         pass
 
     @abstractmethod
@@ -122,12 +120,16 @@ class SqlLayer(AbstractRepository):
         async with async_session_maker() as session:
             try:
                 stmt = await session.execute(select(self.model).filter_by(**kwargs))
-                res = stmt.scalar_one_or_none()
+                res = stmt.scalars().all()  # new libe added
+                # res = stmt.scalar_one_or_none()
+
+                for one_res in res:
+                    await session.delete(one_res)
 
                 if not res:
                     return False
 
-                await session.delete(res)
+                # await session.delete(res)
                 await session.commit()
                 get_logger().info(
                     f"DATA DELETED: {self.model.__name__} with data: {args}, {kwargs}"

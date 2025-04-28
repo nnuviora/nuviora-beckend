@@ -1,11 +1,8 @@
 from typing import Annotated
 import uuid
-
 import httpx
-
 from fastapi.routing import APIRouter
 from fastapi import status, Depends, Request, Response, HTTPException
-
 from schemas.auth_schema import (
     LoginSchema,
     TokenSchema,
@@ -15,7 +12,6 @@ from schemas.auth_schema import (
 )
 from services.auth_service import AuthService
 from api.v1.dependencies import auth_dep
-
 from config import config_setting
 
 
@@ -28,11 +24,11 @@ auth_depends = Annotated[AuthService, Depends(auth_dep)]
     "/register",
     status_code=status.HTTP_201_CREATED,
     responses={
-        400: {"description": "Password Doesn`t Match"},
-        405: {"description": "Metod Not Allow"},
-        409: {"description": "Email is already taken"},
-        500: {"description": "Internal Server Error"},
-        504: {"description": "External Service Is Not Responding"},
+        201: {"description": "Повідомлення надіслано"}, 
+        400: {"description": "Паролі не збігаються"},
+        405: {"description": "Метод заборонено"},
+        409: {"description": "Електронна пошта вже існує"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def register(service: auth_depends, data: RegisterSchema) -> dict:
@@ -46,9 +42,9 @@ async def register(service: auth_depends, data: RegisterSchema) -> dict:
     "/verify_email/{token}",
     status_code=status.HTTP_200_OK,
     responses={
-        400: {"description": "Email verification token has expired"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        400: {"description": "Токен підтвердження електронної пошти протермінований"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def verify_email(
@@ -76,9 +72,9 @@ async def verify_email(
     "/login",
     status_code=status.HTTP_200_OK,
     responses={
-        400: {"description": "Invalid username or password"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server error"},
+        400: {"description": "Недійсне ім'я користувача або пароль"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def login(
@@ -107,11 +103,10 @@ async def login(
     "/resend_email/{user_id}",
     status_code=status.HTTP_200_OK,
     responses={
-        400: {"description": "Email verification token has expired"},
-        405: {"description": "Metod Not Allow"},
-        429: {"description": "Too Many Request"},
-        500: {"description": "Internal Server Error"},
-        504: {"description": "External Service Is Not Responding"},
+        400: {"description": "Токен підтвердження електронної пошти протермінований"},
+        405: {"description": "Метод заборонено"},
+        429: {"description": "Забагато запитів"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def resend_email(user_id: uuid.UUID, service: auth_depends):
@@ -123,8 +118,8 @@ async def resend_email(user_id: uuid.UUID, service: auth_depends):
     "/google_auth",
     status_code=status.HTTP_200_OK,
     responses={
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def google_auth():
@@ -144,8 +139,8 @@ async def google_auth():
     "/google/callback",
     status_code=status.HTTP_200_OK,
     responses={
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def auth_callback(
@@ -195,10 +190,10 @@ async def auth_callback(
     "/refresh_access",
     status_code=status.HTTP_200_OK,
     responses={
-        401: {"description": "Unauthorized"},
-        404: {"description": "User Not Found"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        401: {"description": "Несанкціонований доступ"},
+        404: {"description": "Користувача не знайдено"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def refresh_access(
@@ -226,9 +221,9 @@ async def refresh_access(
     "/forgot_password",
     status_code=status.HTTP_200_OK,
     responses={
-        404: {"description": "User Not Found"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        404: {"description": "Користувача не знайдено"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def forgot_password(data: ChechEmailSchema, service: auth_depends) -> dict:
@@ -241,9 +236,9 @@ async def forgot_password(data: ChechEmailSchema, service: auth_depends) -> dict
     "/forgot_password/{token}",
     status_code=status.HTTP_200_OK,
     responses={
-        200: {"description": "User Verify Successfilly"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        200: {"description": "Користувача успішно підтверджено"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def check_user_verify(token: str, service: auth_depends) -> dict:
@@ -255,10 +250,10 @@ async def check_user_verify(token: str, service: auth_depends) -> dict:
     "/forgot_password/change",
     status_code=status.HTTP_200_OK,
     responses={
-        400: {"description": "Time expired"},
-        401: {"description": "Password Doesn`t Match"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Servet Error"},
+        400: {"description": "Час вичерпано"},
+        401: {"description": "Паролі не збігаються"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def change_password(
@@ -284,8 +279,8 @@ async def change_password(
     "/logout",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal server error"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def logout(request: Request, response: Response, service: auth_depends):

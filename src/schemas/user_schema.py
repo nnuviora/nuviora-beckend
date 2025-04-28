@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime
 from typing import Optional, Union
-
 from pydantic import BaseModel, Field, EmailStr
 
 
@@ -24,11 +23,9 @@ class UserBaseSchema(BaseModel):
         from_attributes = True
 
 
-
 class UserUpdateSchema(BaseModel):
-    username: Optional[str] = None
-    email: Optional[EmailStr] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    phone: Optional[str] = None
-    birth_date: Optional[str] = None
+    username: Optional[str] = Field(default=None)
+    first_name: Optional[str] = Field(default=None)
+    last_name: Optional[str] = Field(default=None)
+    phone: Optional[str] = Field(default=None)
+    birth_date: Optional[datetime] = Field(default=None)

@@ -27,8 +27,15 @@ async def auth_dep() -> AuthService:
     )
 
 
+# email_manager=AwsSender,
+
+
 async def user_dep() -> UserService:
-    return UserService(user_repo=UserRepository, error_handler=HTTPException)
+    return UserService(
+        user_repo=UserRepository(),
+        error_handler=HTTPException,
+        token_repo=TokenRepository(),
+    )
 
 
 async def get_current_user(
@@ -38,13 +45,13 @@ async def get_current_user(
     try:
         payload = await service.security_layer.decode_token(token=token)
         if not payload:
-            raise HTTPException(status_code=401, detail="Unauthorized")
+            raise HTTPException(status_code=401, detail="Несанкціонований доступ")
 
         user_id = payload.get("id")
 
         user = await service.user_repo.get(id=user_id)
         if user is None or user is False:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise HTTPException(status_code=404, detail="Користувача не знайдено")
         return user
     except ValueError:
-        raise HTTPException(status_code=401, detail="Unauthorized")
+        raise HTTPException(status_code=401, detail="Несанкціонований доступ")

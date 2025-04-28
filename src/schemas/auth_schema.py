@@ -22,7 +22,7 @@ class ForgotPassword(BaseModel):
     def check_string(cls, v):
         pattern = r"^(?=.*[a-z])(?=.*[A-Z]).{6,}$"
         if not re.match(pattern, v):
-            raise ValueError("Invalid password")
+            raise ValueError("Пароль має містити хоча б 8 символів")
         return v
 
 

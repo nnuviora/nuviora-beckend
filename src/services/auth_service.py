@@ -72,7 +72,7 @@ class AuthService(Protocol):
 
             if not data:
                 raise self.error_handler(
-                    status_code=400, detail="Email verification token has expired"
+                    status_code=400, detail="Токен підтвердження електронної пошти протермінований"
                 )
 
             await asyncio.gather(
@@ -81,15 +81,15 @@ class AuthService(Protocol):
             )
 
             if data.get("count") >= 3:
-                raise self.error_handler(status_code=429, detail="Too Many Request")
+                raise self.error_handler(status_code=429, detail="Забагато запитів")
 
             data["count"] += 1
             new_token = await self._generate_verification_token(data, exp=180)
-            return {"message": "Message send", "id": user_id}
+            return {"message": "Повідомлення надіслано", "id": user_id}
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def create_handler(self, data: dict) -> dict:
         try:
@@ -97,12 +97,12 @@ class AuthService(Protocol):
                 user_obj = await self.user_repo.get(email=data.get("email"))
                 if user_obj:
                     raise self.error_handler(
-                        status_code=409, detail="Email already exists"
+                        status_code=409, detail="Електронна пошта вже існує"
                     )
 
                 if data.get("hash_password") != data.get("repeat_password"):
                     raise self.error_handler(
-                        status_code=400, detail="Password doesn`t match"
+                        status_code=400, detail="Паролі не збігаються"
                     )
 
                 data["id"] = uuid.uuid4()
@@ -111,7 +111,7 @@ class AuthService(Protocol):
                 )
                 data.pop("repeat_password")
                 token = await self._generate_verification_token(data=data, exp=180)
-                return {"message": "Message sent", "id": data.get("id")}
+                return {"message": "Повідомлення надіслано", "id": data.get("id")}
 
             user_obj = await self.user_repo.get(email=data.get("email"))
             if not user_obj:
@@ -130,7 +130,7 @@ class AuthService(Protocol):
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def _generate_token_pair(self, data: dict, user_agent: Optional[str]) -> dict:
         try:
@@ -154,14 +154,14 @@ class AuthService(Protocol):
                 "refresh_token": refresh_token.get("refresh_token"),
             }
         except Exception as e:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def email_verify_handler(self, data: dict) -> dict:
         try:
             user_obj = await self.cache_manager.get(token=data.get("token"))
             if not data:
                 raise self.error_handler(
-                    status_code=400, detail="Email verification token has expired"
+                    status_code=400, detail="Токен підтвердження електронної пошти протермінований"
                 )
 
             user_obj.pop("count")
@@ -174,7 +174,7 @@ class AuthService(Protocol):
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def user_verify_handler(self, token: str):
         try:
@@ -185,35 +185,35 @@ class AuthService(Protocol):
             await self.cache_manager.delete(token=token)
             await self.cache_manager.set(token=token, data=data, exp=180)
             await self.cache_manager.set(token=str(data.get("id")), data=token, exp=180)
-            return {"message": "User Verify Successfilly"}
+            return {"message": "Користувача успішно підтверджено"}
         except Exception:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def forgot_password_handler(self, data: dict) -> dict:
         try:
             user_obj = await self.user_repo.get(email=data.get("email"))
             if not user_obj:
-                raise self.error_handler(status_code=404, detail="User not found")
+                raise self.error_handler(status_code=404, detail="Користувача не знайдено")
 
             token = await self._generate_verification_token(data=user_obj, exp=180)
-            return {"message": "Password reset email sent", "id": user_obj.get("id")}
+            return {"message": "Повідомлення надіслано", "id": user_obj.get("id")}
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def change_password_handler(self, data: dict) -> dict:
         try:
             if data.get("hash_password") != data.get("repeat_password"):
                 raise self.error_handler(
-                    status_code=401, detail="Password Doesn`t Match"
+                    status_code=401, detail="Паролі не збігаються"
                 )
 
             token = await self.cache_manager.get(token=str(data.get("id")))
             user_obj = await self.cache_manager.get(token=token)
 
             if not user_obj:
-                raise self.error_handler(status_code=400, detail="Time expired")
+                raise self.error_handler(status_code=400, detail="Час вичерпано")
 
             user_obj = await self.user_repo.update(
                 id=user_obj.get("id"),
@@ -227,11 +227,11 @@ class AuthService(Protocol):
             token_pair = await self._generate_token_pair(
                 data=user_obj, user_agent=data.get("user_agent")
             )
-            return {"message": "Password changed succefully"}
+            return {"message": "Пароль успішно змінено"}
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def login_handler(self, data: dict) -> dict:
         try:
@@ -243,7 +243,7 @@ class AuthService(Protocol):
                 )
             ):
                 raise self.error_handler(
-                    status_code=400, detail="Invalid username or password"
+                    status_code=400, detail="Недійсне ім'я користувача або пароль"
                 )
 
             token_pair = await self._generate_token_pair(
@@ -253,7 +253,7 @@ class AuthService(Protocol):
         except self.error_handler as e:
             raise e
         except Exception as e:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def recreate_access_handler(self, data: dict) -> dict:
         try:
@@ -261,7 +261,7 @@ class AuthService(Protocol):
                 token=data.get("refresh_token")
             )
             if not payload:
-                raise self.error_handler(status_code=401, detail="Unauthorized")
+                raise self.error_handler(status_code=401, detail="Несанкціонований доступ")
 
             user_obj = await self.user_repo.get(id=payload.get("id"))
             if not user_obj:
@@ -274,16 +274,16 @@ class AuthService(Protocol):
         except self.error_handler as e:
             raise e
         except ValueError:
-            raise self.error_handler(status_code=410, detail="Gone")
+            raise self.error_handler(status_code=410, detail="Видалено")
         except Exception as e:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def logout_handler(self, refresh_token: str) -> dict:
         try:
             await self.refresh_repo.delete(refresh_token=refresh_token)
-            return {"message": "Logout successfully"}
+            return {"message": "Вихід успішний"}
         except Exception:
-            raise self.error_handler(status_code=500, detail="Internal Server Error")
+            raise self.error_handler(status_code=500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
 
     async def delete_test(self, email: str):
         user_obj = await self.user_repo.get(email=email)
