@@ -65,7 +65,7 @@ async def update_user_info(
 ):
     new_data = new_data.model_dump(
         exclude_none=True
-    )  # converting to dict # 2) excluding NULL values passed ftom the user
+    )
     updated_user = await user_service.update_user(
         user_id=dep["id"], update_data=new_data
     )

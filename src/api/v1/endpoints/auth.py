@@ -21,14 +21,14 @@ auth_depends = Annotated[AuthService, Depends(auth_dep)]
 
 
 @router.post(
-    "/Register",
+    "/register",
     status_code=status.HTTP_201_CREATED,
     responses={
-        400: {"description": "Password Doesn`t Match"},
-        405: {"description": "Metod Not Allow"},
-        409: {"description": "Email is already taken"},
-        500: {"description": "Internal Server Error"},
-        504: {"description": "External Service Is Not Responding"},
+        201: {"description": "Повідомлення надіслано"}, 
+        400: {"description": "Паролі не збігаються"},
+        405: {"description": "Метод заборонено"},
+        409: {"description": "Електронна пошта вже існує"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def register(service: auth_depends, data: RegisterSchema) -> dict:
@@ -41,40 +41,40 @@ async def register(service: auth_depends, data: RegisterSchema) -> dict:
 @router.get(
     "/verify_email/{token}",
     status_code=status.HTTP_200_OK,
-    # responses={
-    #     400: {"description": "Email verification token has expired"},
-    #     405: {"description": "Metod Not Allow"},
-    #     500: {"description": "Internal Server Error"},
-    # },
+    responses={
+        400: {"description": "Токен підтвердження електронної пошти протермінований"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
+    },
 )
 async def verify_email(
     service: auth_depends, token: str, request: Request, response: Response
 ) -> TokenSchema:
-    try:
-        data = {"user_agent": request.headers.get("User-Agent"), "token": token}
-        service_action = await service.email_verify_handler(data=data)
-        response.set_cookie(
-            key="refresh_token",
-            value=service_action["refresh_token"],
-            httponly=True,
-            secure=False,
-            samesite="strict",
-        )
-        return {
-            "access_token": service_action.get("access_token"),
-            "user": service_action.get("user"),
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+    data = {"user_agent": request.headers.get("User-Agent"), "token": token}
+    service_action = await service.email_verify_handler(data=data)
+    response.set_cookie(
+        key="refresh_token",
+        value=service_action.get("refresh_token"),
+        path="/",
+        httponly=True,
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        domain="nuviora.click"
+    )
+    return {
+        "access_token": service_action.get("access_token"),
+        "user": service_action.get("user"),
+    }
 
 
 @router.post(
     "/login",
     status_code=status.HTTP_200_OK,
     responses={
-        401: {"description": "Invalid username or password"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server error"},
+        400: {"description": "Недійсне ім'я користувача або пароль"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def login(
@@ -86,9 +86,12 @@ async def login(
     response.set_cookie(
         key="refresh_token",
         value=service_action.get("refresh_token"),
+        path="/",
         httponly=True,
-        secure=False,
-        samesite="strict",
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        domain="nuviora.click"
     )
     return {
         "access_token": service_action.get("access_token"),
@@ -100,11 +103,10 @@ async def login(
     "/resend_email/{user_id}",
     status_code=status.HTTP_200_OK,
     responses={
-        400: {"description": "Email verification token has expired"},
-        405: {"description": "Metod Not Allow"},
-        429: {"description": "Too Many Request"},
-        500: {"description": "Internal Server Error"},
-        504: {"description": "External Service Is Not Responding"},
+        400: {"description": "Токен підтвердження електронної пошти протермінований"},
+        405: {"description": "Метод заборонено"},
+        429: {"description": "Забагато запитів"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def resend_email(user_id: uuid.UUID, service: auth_depends):
@@ -116,8 +118,8 @@ async def resend_email(user_id: uuid.UUID, service: auth_depends):
     "/google_auth",
     status_code=status.HTTP_200_OK,
     responses={
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def google_auth():
@@ -137,8 +139,8 @@ async def google_auth():
     "/google/callback",
     status_code=status.HTTP_200_OK,
     responses={
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def auth_callback(
@@ -174,9 +176,12 @@ async def auth_callback(
         response.set_cookie(
             key="refresh_token",
             value=service_action.get("refresh_token"),
+            path="/",
             httponly=True,
-            secure=False,
-            samesite="strict",
+            secure=True,
+            samesite="none",
+            max_age=7*24*60*60,
+            domain="nuviora.click"
         )
     return service_action
 
@@ -185,10 +190,10 @@ async def auth_callback(
     "/refresh_access",
     status_code=status.HTTP_200_OK,
     responses={
-        401: {"description": "Unauthorized"},
-        404: {"description": "User Not Found"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        401: {"description": "Несанкціонований доступ"},
+        404: {"description": "Користувача не знайдено"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def refresh_access(
@@ -202,9 +207,12 @@ async def refresh_access(
     response.set_cookie(
         key="refresh_token",
         value=service_action.get("refresh_token"),
+        path="/",
         httponly=True,
-        secure=False,
-        samesite="strict",
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        domain="nuviora.click"
     )
     return service_action
 
@@ -213,9 +221,9 @@ async def refresh_access(
     "/forgot_password",
     status_code=status.HTTP_200_OK,
     responses={
-        404: {"description": "User Not Found"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        404: {"description": "Користувача не знайдено"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def forgot_password(data: ChechEmailSchema, service: auth_depends) -> dict:
@@ -228,9 +236,9 @@ async def forgot_password(data: ChechEmailSchema, service: auth_depends) -> dict
     "/forgot_password/{token}",
     status_code=status.HTTP_200_OK,
     responses={
-        200: {"description": "User Verify Successfilly"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Server Error"},
+        200: {"description": "Користувача успішно підтверджено"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def check_user_verify(token: str, service: auth_depends) -> dict:
@@ -242,42 +250,49 @@ async def check_user_verify(token: str, service: auth_depends) -> dict:
     "/forgot_password/change",
     status_code=status.HTTP_200_OK,
     responses={
-        400: {"description": "Time expired"},
-        401: {"description": "Password Doesn`t Match"},
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal Servet Error"},
+        400: {"description": "Час вичерпано"},
+        401: {"description": "Паролі не збігаються"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
 async def change_password(
     data: ChangePassword, request: Request, response: Response, service: auth_depends
-) -> TokenSchema:
+) -> dict:
     data = data.model_dump()
     data["user_agent"] = request.headers.get("User-Agent")
     service_action = await service.change_password_handler(data=data)
     response.set_cookie(
         key="refresh_token",
         value=service_action.get("refresh_token"),
+        path="/",
         httponly=True,
-        secure=False,
-        samesite="strict",
+        secure=True,
+        samesite="none",
+        max_age=7*24*60*60,
+        domain="nuviora.click"
     )
-    return {
-        "access_token": service_action.get("access_token"),
-        "user": service_action.get("user"),
-    }
+    return service_action
 
 
 @router.get(
     "/logout",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
-        405: {"description": "Metod Not Allow"},
-        500: {"description": "Internal server error"},
+        405: {"description": "Метод заборонено"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
     },
 )
-async def logout(request: Request, service: auth_depends):
+async def logout(request: Request, response: Response, service: auth_depends):
     refresh_token = request.cookies.get("refresh_token")
     service_action = await service.logout_handler(refresh_token=refresh_token)
+    response.delete_cookie(
+        key="refresh_token",
+        path="/",
+        domain="nuviora.click",
+        samesite="none",
+        secure=True
+    )
     return service_action
 
 

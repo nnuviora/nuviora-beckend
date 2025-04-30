@@ -2,9 +2,7 @@ import uuid
 import re
 from typing import Union, Optional
 
-from pydantic import BaseModel, EmailStr, field_validator, Field
-
-from .user_schema import UserBaseSchema
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 class LoginSchema(BaseModel):
@@ -14,7 +12,6 @@ class LoginSchema(BaseModel):
 
 class TokenSchema(BaseModel):
     access_token: str
-    user: Optional[UserBaseSchema] = Field(default=None)
 
 
 class ForgotPassword(BaseModel):
@@ -25,7 +22,7 @@ class ForgotPassword(BaseModel):
     def check_string(cls, v):
         pattern = r"^(?=.*[a-z])(?=.*[A-Z]).{6,}$"
         if not re.match(pattern, v):
-            raise ValueError("Invalid password")
+            raise ValueError("Пароль має містити хоча б 8 символів")
         return v
 
 

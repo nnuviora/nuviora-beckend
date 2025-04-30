@@ -16,8 +16,8 @@ class UserBaseSchema(BaseModel):
     address: Optional[Union[dict, int]] = Field(default=False)
     created_at: Optional[datetime] = Field(default=None)
     updated_at: Optional[datetime] = Field(default=None)
-    is_activate: bool = Field(default=False)
-    is_locked: bool = Field(default=False)
+    is_activate: Optional[bool] = Field(default=False)
+    is_locked: Optional[bool] = Field(default=False)
 
     class Config:
         from_attributes = True
