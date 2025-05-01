@@ -1,7 +1,14 @@
 from typing import Optional
 
-from pydantic import Field, field_validator, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import (
+    Field,
+    field_validator,
+    model_validator,
+)
+from pydantic_settings import (
+    BaseSettings,
+    SettingsConfigDict,
+)
 
 
 class ConfigSettings(BaseSettings):
@@ -24,7 +31,36 @@ class ConfigSettings(BaseSettings):
             )
         return self
 
-    model_config = SettingsConfigDict(env_file='../.env', env_file_encoding='utf-8')
+    REDIS_HOST: str
+    REDIS_PORT: int
+
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    REFRESH_TOKEN_EXPIRE_DAYS: int
+
+    SENDER: str
+    CHARSET: str
+    CONFIGURATION_SET: str
+    AWS_REGION: str
+    ACCESS_KEY: str
+    SECRET_ACCESS_KEY: str
+
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM: str
+    MAIL_PORT: int
+    MAIL_SERVER: str
+
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    GOOGLE_REDIRECT_URI: str
+
+    GOOGLE_AUTH_URL: str
+    GOOGLE_TOKEN_URL: str
+    GOOGLE_USERINFO_URL: str
+
+    model_config = SettingsConfigDict(env_file="../.env", env_file_encoding="utf-8")
 
 
 config_setting = ConfigSettings()

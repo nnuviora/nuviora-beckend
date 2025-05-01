@@ -1,0 +1,63 @@
+import uuid
+from typing import Protocol
+from utils.repository import AbstractRepository
+from repositories.user_repo import TokenRepository
+
+
+class UserService(Protocol):
+    def __init__(self, user_repo, error_handler, token_repo) -> None:
+        self.user_repo: AbstractRepository = user_repo
+        self.error_handler = error_handler
+        self.token_repo: TokenRepository = token_repo
+
+
+    async def get_one_user(self, user_id: str) -> dict:
+        try:
+            user_info_dict = await self.user_repo.get(id=user_id)
+            print(user_info_dict)
+            if not user_info_dict:
+                raise self.error_handler(status_code=404, detail="User not found")
+            return user_info_dict
+        except self.error_handler as e:
+            raise e
+        except Exception as e:
+            raise Exception(f"The user cannot be found")
+        
+
+    async def delete_one_user(self, uuid):
+        try:
+            # geting the user
+            user_to_delete = await self.user_repo.get(id=uuid)
+
+            # check if the user exists
+            if not user_to_delete:
+                raise self.error_handler(status_code=404, detail="User does not exist")
+
+            # deleting user tokens
+            await self.token_repo.delete(user_id=uuid)
+
+            # delete user
+            await self.user_repo.delete(id=uuid)
+            return {"message": "The user was deleted seccesfully"}
+
+        except self.error_handler as e:
+            raise e
+        except Exception as e:
+            raise Exception(f"User to delete not found")
+
+    async def update_user(self, user_id: uuid.UUID, update_data: dict):
+
+        try:
+            user = await self.user_repo.get(id=user_id)
+            if not user:
+                raise self.error_handler(
+                    status_code=404, detail="User for update not found"
+                )
+
+            updated_user = await self.user_repo.update(id=user_id, data=update_data)
+            return updated_user
+
+        except self.error_handler as e:
+            raise e
+        except Exception as e:
+            raise Exception(f"User update has failed")

@@ -14,9 +14,8 @@ This project is an API developed using **FastAPI**. It utilizes Docker for conta
 ## Project Structure
 
 ```plaintext
-├── docker/
-│   └── Dockerfile                # Dockerfile for container setup
 ├── nginx/
+|   ├── Dockerfile.nginx          # Nginx container
 │   └── nginx.conf                # Nginx configuration
 ├── src/
 │   ├── api/                      
@@ -29,11 +28,11 @@ This project is an API developed using **FastAPI**. It utilizes Docker for conta
 │   ├── schemas/                  # Pydantic or Marshmallow schemas for validation
 │   ├── services/                 # Core business logic
 │   ├── utils/                    # Utility functions
+|   ├── Dockerfile                # Dockerfile for container setup
 │   ├── config.py                 # Configuration settings
 │   ├── database.py               # Database setup and connection management
 │   └── main.py                   # Entry point for the application
 ├── test/                         # Unit and integration tests
-├── docker-compose.yml            # Docker Compose file for multi-container setup
 └── .gitignore                    # Git ignore file
 ```
 
@@ -44,7 +43,7 @@ First, clone this repository:
 
 ```bash
 git clone https://github.com/nnuviora/nuviora-beckend.git
-cd project-name
+cd nuviora-beckend
 ```
 
 ### 2. Set Up Environment Variables

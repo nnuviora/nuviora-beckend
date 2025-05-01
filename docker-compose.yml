@@ -1,10 +1,12 @@
-version: "3.9"
+version: '3.8'
 
 services:
   db:
     image: postgres:15
     container_name: postgres_db
     restart: always
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -13,6 +15,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
 
   redis:
     image: redis:7
@@ -20,36 +27,40 @@ services:
     restart: always
     ports:
       - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
 
-  app:
+  fastapi:
     build:
-      context: .
-      dockerfile: docker/Dockerfile
+      context: ./src
+      dockerfile: Dockerfile
     container_name: fastapi_app
     restart: always
-    depends_on:
-      - db
-      - redis
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/${POSTGRES_DB}
-      REDIS_URL: redis://redis:6379/0
-    expose:
-      - "8000"
-    volumes:
-      - ./src:/app
     env_file:
       - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./src:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   nginx:
-    image: nginx:latest
-    container_name: nginx_proxy
-    restart: always
-    depends_on:
-      - app
+    image: nginx:alpine
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - fastapi
 
 volumes:
   postgres_data:
+  redis_data:

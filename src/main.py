@@ -2,20 +2,24 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import engine, Base
-from api.routers import routers
+from api.routers import routers as api_routers
 
 
 def get_application() -> FastAPI:
 
-    # async def startup():
-    #     async with engine.begin() as conn:
-    #         await conn.run_sync(Base.metadata.create_all)
+    async def startup():
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
 
     application = FastAPI()
 
-    # application.add_event_handler("startup", startup)
+    application.add_event_handler("startup", startup)
 
-    origins = []
+    origins = [
+        "https://nuviora.vercel.app",
+        "https://nuviora-frontend-git-dev-nnuvioras-projects.vercel.app",
+        "http://localhost:3000",
+    ]
 
     application.add_middleware(
         CORSMiddleware,
@@ -25,7 +29,7 @@ def get_application() -> FastAPI:
         allow_headers=["*"],
     )
 
-    for router in routers:
+    for router in api_routers:
         application.include_router(router=router)
 
     return application
