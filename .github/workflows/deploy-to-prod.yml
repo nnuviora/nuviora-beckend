@@ -1,0 +1,41 @@
+name: Deploy Docker App to EC2 (Production)
+
+on:
+  push:
+    branches:
+      - main  # 🔧 CHANGED: тепер реагує на пуш у main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_KEY_PROD }}" > ~/.ssh/aws_key.pem  # 🔧 CHANGED: інший SSH ключ
+          chmod 600 ~/.ssh/aws_key.pem
+          ssh-keyscan -H ${{ secrets.AWS_HOST_PROD }} >> ~/.ssh/known_hosts  # 🔧 CHANGED: інша адреса хоста
+
+      - name: Copy all project files to EC2 (excluding problematic dirs)
+        run: |
+          rsync -avz --exclude '__pycache__' --exclude '.git' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ \
+            ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }}:/home/ubuntu/nuviora_backend  # 🔧 CHANGED
+
+      - name: Rebuild and restart fastapi container
+        run: |
+          ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }} << 'EOF'  # 🔧 CHANGED
+            cd /home/ubuntu/nuviora_backend
+
+            echo "==> Stopping fastapi container..."
+            docker-compose stop fastapi || true
+
+            echo "==> Rebuilding fastapi container with no cache..."
+            docker-compose build --no-cache fastapi
+
+            echo "==> Starting fastapi container..."
+            docker-compose up -d fastapi
+          EOF
