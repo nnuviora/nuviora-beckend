@@ -23,7 +23,7 @@ jobs:
       - name: Sync only `src/` to EC2, keeping other files intact
         run: |
           rsync -avz --exclude '__pycache__' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" \
-            ./nuviora-beckend/src/ \
+            ./src/ \
             ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }}:/home/ubuntu/nuviora-beckend/src/
 
       - name: Rebuild and restart fastapi container
