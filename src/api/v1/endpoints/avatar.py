@@ -20,15 +20,6 @@ from services.load_service import LoadService
 router = APIRouter(prefix="/avatar", tags=["Avatar"])
 
 
-@router.post("/upload-avatar", 
-    status_code=status.HTTP_200_OK,
-    summary="Upload user avatar to S3",
-    responses={
-        401: {"description": "Unauthorized"},
-        400: {"description": "No file provided"},
-        500: {"description": "Failed to upload avatar"},
-    },
-)
 @router.post(
     "/upload-avatar", 
     status_code=status.HTTP_200_OK,

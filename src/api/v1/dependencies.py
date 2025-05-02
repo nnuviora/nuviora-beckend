@@ -57,7 +57,7 @@ async def get_current_user(
     except ValueError:
         raise HTTPException(status_code=401, detail="Несанкціонований доступ")
 
-def get_load_service() -> LoadService:
+async def get_load_service() -> LoadService:
     return LoadService()
 
 

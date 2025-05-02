@@ -22,7 +22,8 @@ class LoadService:
 
         try:
             # Обробка зображення
-            image = Image.open(avatar.file).convert("RGB").resize((320, 320))
+            file_bytes = await avatar.read()  # Читаємо весь файл
+            image = Image.open(io.BytesIO(file_bytes)).convert("RGB").resize((320, 320))
             buffer = io.BytesIO()
             image.save(buffer, format="WEBP")
             buffer.seek(0)
