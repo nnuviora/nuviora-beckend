@@ -24,7 +24,7 @@ jobs:
         run: |
           rsync -avz --exclude '__pycache__' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" \
             ./nuviora-beckend/src/ \
-            ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora-beckend/src/
+            ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend/src/
 
       - name: Rebuild and restart fastapi container
         run: |
