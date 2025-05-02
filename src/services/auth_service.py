@@ -3,10 +3,12 @@ import random
 import asyncio
 from datetime import datetime
 from typing import Protocol, Optional
+from fastapi import UploadFile
 
 from utils.repository import AbstractRepository
 from utils.cache_manager import AbstractCache
 from utils.email_manager import AbstractEmail
+from services.s3_avatar_uploader import S3AvatarUploader
 
 
 class AuthService(Protocol):
@@ -299,3 +301,21 @@ class AuthService(Protocol):
             await self.refresh_repo.delete(id=token["id"])
 
         await self.user_repo.delete(id=user_obj["id"])
+
+    # async def update_avatar_handler(self, user_id: uuid.UUID, file: UploadFile) -> dict:
+    #     try:
+    #         # Завантажуємо аватар на S3
+    #         uploader = S3AvatarUploader()
+    #         contents = await file.read()
+    #         avatar_url = uploader.upload_avatar(
+    #             file_bytes=contents,
+    #             filename=file.filename,
+    #             content_type=file.content_type
+    #         )
+
+    #         # Оновлюємо аватар в базі даних через репозиторій
+    #         updated_user = await self.user_repo.update_avatar(user_id=user_id, avatar_url=avatar_url)
+
+    #         return {"message": "Avatar updated successfully", "user": updated_user}
+    #     except Exception as e:
+    #         raise self.error_handler(status_code=500, detail="Failed to update avatar")

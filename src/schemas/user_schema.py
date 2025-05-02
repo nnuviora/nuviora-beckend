@@ -29,3 +29,7 @@ class UserUpdateSchema(BaseModel):
     last_name: Optional[str] = Field(default=None)
     phone: Optional[str] = Field(default=None)
     birth_date: Optional[datetime] = Field(default=None)
+
+
+class UserUpdateAvatar(BaseModel):
+    avatar: str

@@ -43,6 +43,7 @@ class ConfigSettings(BaseSettings):
     CHARSET: str
     CONFIGURATION_SET: str
     AWS_REGION: str
+    AWS_BUCKET_NAME: str
     ACCESS_KEY: str
     SECRET_ACCESS_KEY: str
 

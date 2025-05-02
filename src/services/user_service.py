@@ -2,7 +2,7 @@ import uuid
 from typing import Protocol
 from utils.repository import AbstractRepository
 from repositories.user_repo import TokenRepository
-
+from schemas.user_schema import UserUpdateAvatar
 
 class UserService(Protocol):
     def __init__(self, user_repo, error_handler, token_repo) -> None:
@@ -61,3 +61,19 @@ class UserService(Protocol):
             raise e
         except Exception as e:
             raise Exception(f"User update has failed")
+
+    async def update_user_avatar(self, user_id: uuid.UUID, avatar_url: str):
+        try:
+            user = await self.user_repo.get(id=user_id)
+            if not user:
+                raise self.error_handler(status_code=404, detail="User for update not found")
+
+            updated_user_avatar = await self.user_repo.update(id=user_id, data={"avatar": avatar_url})
+            if not updated_user_avatar:
+                raise self.error_handler(status_code=500, detail="Failed to update user avatar")
+
+            return updated_user_avatar
+
+        except Exception as e:
+            raise self.error_handler(status_code=500, detail=f"User avatar update failed: {str(e)}")
+
