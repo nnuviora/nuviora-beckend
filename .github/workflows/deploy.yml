@@ -20,10 +20,11 @@ jobs:
           chmod 600 ~/.ssh/aws_key.pem
           ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Copy all project files to EC2 (excluding problematic dirs)
+      - name: Sync only `src/` to EC2, keeping other files intact
         run: |
-          rsync -avz --exclude '__pycache__' --exclude '.git' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" ./ \
-            ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend
+          rsync -avz --exclude '__pycache__' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" \
+            ./src/ \
+            ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }}:/home/ubuntu/nuviora_backend/src/
 
       - name: Rebuild and restart fastapi container
         run: |

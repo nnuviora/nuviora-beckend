@@ -23,9 +23,9 @@ class UserModel(Base):
     email: Mapped[str] = mapped_column(unique=True)
     first_name: Mapped[str] = mapped_column(nullable=True)
     last_name: Mapped[str] = mapped_column(nullable=True)
+    about: Mapped[str] = mapped_column(nullable=True)
     avatar: Mapped[str] = mapped_column(nullable=True)
     phone: Mapped[str] = mapped_column(nullable=True)
-    auth_type: Mapped[str] = mapped_column()
     birth_date: Mapped[datetime] = mapped_column(default=datetime.now())
     created_at: Mapped[datetime] = mapped_column(default=datetime.now())
     updated_at: Mapped[datetime] = mapped_column(default=datetime.now())
@@ -54,6 +54,7 @@ class UserModel(Base):
             "email": self.email,
             "first_name": self.first_name,
             "last_name": self.last_name,
+            "about": self.about,
             "avatar": self.avatar,
             "phone": self.phone,
             "birth_date": self.birth_date,

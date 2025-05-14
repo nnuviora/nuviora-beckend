@@ -6,10 +6,11 @@ from pydantic import BaseModel, Field, EmailStr
 
 class UserBaseSchema(BaseModel):
     id: Optional[uuid.UUID] = Field(default=False)
-    usename: Optional[str] = Field(default=None)
+    username: Optional[str] = Field(default=None)
     email: EmailStr
     first_name: Optional[str] = Field(default=None)
     last_name: Optional[str] = Field(default=None)
+    about: Optional[str] = Field(default=None)
     avatar: Optional[str] = Field(default=None)
     phone: Optional[str] = Field(default=None)
     birth_date: Optional[datetime] = Field(default=None)
@@ -24,8 +25,13 @@ class UserBaseSchema(BaseModel):
 
 
 class UserUpdateSchema(BaseModel):
-    username: Optional[str] = Field(default=None)
+    # username: Optional[str] = Field(default=None)
     first_name: Optional[str] = Field(default=None)
     last_name: Optional[str] = Field(default=None)
+    about: Optional[str] = Field(default=None)
     phone: Optional[str] = Field(default=None)
     birth_date: Optional[datetime] = Field(default=None)
+
+
+class UserUpdateAvatar(BaseModel):
+    avatar: str
