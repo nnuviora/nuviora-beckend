@@ -35,3 +35,15 @@ class UserUpdateSchema(BaseModel):
 
 class UserUpdateAvatar(BaseModel):
     avatar: str
+
+
+class UserChangePasswrdSchema(BaseModel):
+    """
+    Schema for changing a user's password.
+
+    Attributes:
+        current_password (str): The user's current password (min 6 characters).
+        new_password (str): The new password the user wants to set (min 6 characters).
+    """
+    current_password: str = Field(min_length=6)
+    new_password: str = Field(min_length=6)

@@ -3,7 +3,7 @@ from fastapi.routing import APIRouter
 from fastapi import status, Depends, Request, Response, HTTPException
 from repositories.user_repo import UserRepository
 from services.user_service import UserService
-from schemas.user_schema import UserBaseSchema, UserUpdateSchema
+from schemas.user_schema import UserBaseSchema, UserUpdateSchema, UserChangePasswrdSchema
 from api.v1.dependencies import get_current_user, user_dep
 
 
@@ -37,7 +37,8 @@ async def profile(user: user_base_schema_dep) -> UserBaseSchema:
     },
 )
 async def delete_user(
-    current_user: user_base_schema_dep, user_service: user_service_dep
+    current_user: user_base_schema_dep, 
+    user_service: user_service_dep
 ):
 
     user_id = current_user.get("id")
@@ -70,3 +71,54 @@ async def update_user_info(
         user_id=dep["id"], update_data=new_data
     )
     return updated_user
+
+
+@router.put(
+    "/change_password", status_code=status.HTTP_200_OK,
+        responses={
+        200: {"description": "User password updated successfully"},
+        400: {"description": "Invalid request"},
+        401: {"description": "Unauthorized"},
+        403: {"description": "Forbidden"},
+        404: {"description": "User not found"},
+        409: {"description": "Conflict with existing data"},
+        422: {"description": "Validation error"},
+    },
+)
+async def update_user_password(
+    current_user: user_base_schema_dep,
+    user_service: user_service_dep,
+    new_password: UserChangePasswrdSchema
+
+
+):
+    """
+    Update the password for the current authenticated user.
+
+    Args:
+        current_user (user_base_schema_dep): The currently authenticated user, provided via dependency injection.
+        user_service (user_service_dep): Service layer for user operations.
+        new_password (UserChangePasswrdSchema): Schema containing the current and new password.
+
+    Raises:
+        HTTPException: If the current password is incorrect (403 Forbidden).
+
+    Returns:
+        dict: A success message indicating the password was updated.
+    """
+    
+    is_valid = await user_service.security_layer.verify_password(
+        password=new_password.current_password,
+        hash_password=current_user["hash_password"]
+    )
+    if not is_valid:
+        raise HTTPException(status_code=403, detail="Неправильний поточний пароль")
+
+    
+    user_with_new_pass = await user_service.change_user_password(
+        user_id=current_user["id"],
+        new_password={"new_password": new_password.new_password}
+    )
+    #DELETE print statement IN PRODUCTION
+    print (f"Passwoprd for user {user_with_new_pass.get('email')} was updated succesfully")
+    return {"message": f"Password for User: {current_user.get('id')} updated succesfully"}

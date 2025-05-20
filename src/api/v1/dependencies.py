@@ -12,6 +12,8 @@ from utils.template_render import get_template
 from utils.email_manager import MetaUaSender
 from services.load_service import LoadService
 
+from core.security import SecurityBase
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -36,6 +38,7 @@ async def user_dep() -> UserService:
         user_repo=UserRepository(),
         error_handler=HTTPException,
         token_repo=TokenRepository(),
+        security_layer=SecurityBase(),
     )
 
 
@@ -56,6 +59,7 @@ async def get_current_user(
         return user
     except ValueError:
         raise HTTPException(status_code=401, detail="Несанкціонований доступ")
+    
 
 async def get_load_service() -> LoadService:
     return LoadService()

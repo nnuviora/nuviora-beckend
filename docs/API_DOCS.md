@@ -177,6 +177,24 @@ Follow these steps to set up the API locally:
 - **Response Codes:**
   - `204 No Content`: User logged out successfully.
 
+
+## USER PROFILE:
+
+### 10. Update User Password
+
+- **URL:** `/profile/change_password`
+- **Method:** `PUT`
+- **Description:** Changes password for currently logged-in user.
+- **Response Codes:**
+  - `200 OK` : User password updated successfully.
+
+ ```json
+  {
+  "current_password": "string",
+  "new_password": "string"
+  }
+  ```
+
 ## Example Usage
 
 ```bash
