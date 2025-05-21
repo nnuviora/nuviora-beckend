@@ -18,8 +18,8 @@ user_base_schema_dep = Annotated[UserBaseSchema, Depends(get_current_user)]
     "/me",
     status_code=status.HTTP_200_OK,
     responses={
-        401: {"description": "Unauthorized: Invalid or missing token"},
-        500: {"description": "Internal Server Error"},
+        401: {"description": "Неправильний або відсутній токен"},
+        500: {"description": "Упс! Щось пішло не так, спробуйте пізніше"},
     },
 )
 async def profile(user: user_base_schema_dep) -> UserBaseSchema:
@@ -30,10 +30,10 @@ async def profile(user: user_base_schema_dep) -> UserBaseSchema:
     "/delete_user",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
-        401: {"description": "Unauthorized: Invalid or missing token"},
-        403: {"description": "Forbidden: No permission to delete user"},
-        404: {"description": "User not found"},
-        500: {"description": "Internal Server Error"},
+        401: {"description": "Неправильний або відсутній токен"},
+        403: {"description": "у вас немає прав щоб видалити користувача"},
+        404: {"description": "Такого користувача не існує"},
+        500: {"description": "Упс! Щось пішло не так, спробуйте пізніше"},
     },
 )
 async def delete_user(
@@ -43,20 +43,20 @@ async def delete_user(
 
     user_id = current_user.get("id")
     await user_service.delete_one_user(uuid=user_id)
-    return {"message": f"User {current_user.get('id')} succesfully deleted"}
+    return {"message": f"Користувач {current_user.get('id')} успішно видалений"}
 
 
 @router.put(
     "/update_user_info",
     status_code=status.HTTP_200_OK,
     responses={
-        200: {"description": "User info updated successfully"},
-        400: {"description": "Invalid request"},
-        401: {"description": "Unauthorized"},
-        403: {"description": "Forbidden"},
-        404: {"description": "User not found"},
-        409: {"description": "Conflict with existing data"},
-        422: {"description": "Validation error"},
+        200: {"description": "Інформація оновлена успішно"},
+        400: {"description": "Неправильний запит"},
+        401: {"description": "Немає прав доступу"},
+        403: {"description": "Заборонено"},
+        404: {"description": "Такого користувача не існує"},
+        409: {"description": "Конфлікт з існуючими даними"},
+        422: {"description": "Помилка валідації"},
     },
 )
 async def update_user_info(
@@ -76,21 +76,19 @@ async def update_user_info(
 @router.put(
     "/change_password", status_code=status.HTTP_200_OK,
         responses={
-        200: {"description": "User password updated successfully"},
-        400: {"description": "Invalid request"},
-        401: {"description": "Unauthorized"},
-        403: {"description": "Forbidden"},
-        404: {"description": "User not found"},
-        409: {"description": "Conflict with existing data"},
-        422: {"description": "Validation error"},
+        200: {"description": "Пароль оновлено успішно"},
+        400: {"description": "Неправильний запит"},
+        401: {"description": "Немає прав доступу"},
+        403: {"description": "Заборонено"},
+        404: {"description": "Такого користувача не існує"},
+        409: {"description": "Конфлікт з існуючими даними"},
+        422: {"description": "Помилка валідації, паролі не співпадють?"},
     },
 )
 async def update_user_password(
     current_user: user_base_schema_dep,
     user_service: user_service_dep,
     new_password: UserChangePasswrdSchema
-
-
 ):
     """
     Update the password for the current authenticated user.
@@ -121,4 +119,4 @@ async def update_user_password(
     )
     #DELETE print statement IN PRODUCTION
     print (f"Passwoprd for user {user_with_new_pass.get('email')} was updated succesfully")
-    return {"message": f"Password for User: {current_user.get('id')} updated succesfully"}
+    return {"message": f"Пароль для користувача: {current_user.get('id')} успішно оновлений"}
