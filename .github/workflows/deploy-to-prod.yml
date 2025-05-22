@@ -26,11 +26,11 @@ jobs:
             ./src/ \
             ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }}:/home/ubuntu/nuviora-beckend/src/
 
-      - name: Sync `test/` to EC2
+      - name: Sync `tests/` to EC2
         run: |
           rsync -avz --exclude '__pycache__' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" \
-            ./test/ \
-            ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }}:/home/ubuntu/nuviora-beckend/test/
+            ./tests/ \
+            ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }}:/home/ubuntu/nuviora-beckend/tests/
 
       - name: Rebuild and restart fastapi container
         run: |
