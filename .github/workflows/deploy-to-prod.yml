@@ -37,12 +37,9 @@ jobs:
           ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }} << 'EOF'  # 🔧 CHANGED
             cd /home/ubuntu/nuviora-beckend
 
-            echo "==> Stopping fastapi container..."
-            docker-compose stop fastapi || true
+            echo "==> Stopping container..."
+            docker-compose down || true
 
-            echo "==> Rebuilding fastapi container with no cache..."
-            docker-compose build --no-cache fastapi
-
-            echo "==> Starting fastapi container..."
-            docker-compose up -d fastapi
+            echo "==> Starting container..."
+            docker-compose up -d
           EOF
