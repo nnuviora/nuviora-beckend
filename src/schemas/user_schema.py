@@ -1,7 +1,8 @@
 import uuid
 from datetime import datetime
 from typing import Optional, Union
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, model_validator
+from typing_extensions import Self
 
 
 class UserBaseSchema(BaseModel):
@@ -35,3 +36,23 @@ class UserUpdateSchema(BaseModel):
 
 class UserUpdateAvatar(BaseModel):
     avatar: str
+
+
+class UserChangePasswrdSchema(BaseModel):
+    """
+    Schema for changing a user's password.
+
+    Attributes:
+        current_password (str): The user's current password (min 6 characters).
+        new_password (str): The new password the user wants to set (min 6 characters).
+    """
+    current_password: str = Field(..., min_length=6)
+    new_password: str = Field(..., min_length=6)
+    confirm_new_password:str = Field(..., min_length=6)
+
+
+    @model_validator(mode="after")
+    def check_if_passwords_match(self) -> Self:
+        if self.new_password != self.confirm_new_password:
+            raise ValueError ("Паролі не співпадають")
+        return self        
