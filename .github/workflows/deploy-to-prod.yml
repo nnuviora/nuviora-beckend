@@ -1,0 +1,45 @@
+name: Deploy Docker App to EC2 (Production)
+
+on:
+  push:
+    branches:
+      - main  # 🔧 CHANGED: тепер реагує на пуш у main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_KEY_PROD }}" > ~/.ssh/aws_key.pem  # 🔧 CHANGED: інший SSH ключ
+          chmod 600 ~/.ssh/aws_key.pem
+          ssh-keyscan -H ${{ secrets.AWS_HOST_PROD }} >> ~/.ssh/known_hosts  # 🔧 CHANGED: інша адреса хоста
+
+      - name: Sync only `src/` to EC2, keeping other files intact
+        run: |
+          rsync -avz --exclude '__pycache__' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" \
+            ./src/ \
+            ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }}:/home/ubuntu/nuviora-beckend/src/
+
+      - name: Sync `tests/` to EC2
+        run: |
+          rsync -avz --exclude '__pycache__' -e "ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no" \
+            ./tests/ \
+            ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }}:/home/ubuntu/nuviora-beckend/tests/
+
+      - name: Rebuild and restart fastapi container
+        run: |
+          ssh -i ~/.ssh/aws_key.pem -o StrictHostKeyChecking=no ${{ secrets.AWS_USER_PROD }}@${{ secrets.AWS_HOST_PROD }} << 'EOF'  # 🔧 CHANGED
+            cd /home/ubuntu/nuviora-beckend
+
+            echo "==> Stopping container..."
+            docker-compose down || true
+
+            echo "==> Starting container..."
+            docker-compose up -d
+          EOF
