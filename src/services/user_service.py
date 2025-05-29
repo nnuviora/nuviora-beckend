@@ -99,6 +99,10 @@ class UserService(Protocol):
             plain_password = new_password.get("new_password") 
             hashed_password = await self.security_layer.hash_password(plain_password)
 
+            #invalidate the current token
+            await self.token_repo.delete(user_id=user_id)
+
+
             user_with_new_pass = await self.user_repo.update(
                 id=user_id, 
                 data={"hash_password": hashed_password}

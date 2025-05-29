@@ -111,6 +111,8 @@ async def update_user_password(
     )
     if not is_valid:
         raise HTTPException(status_code=403, detail="Неправильний поточний пароль")
+    
+
 
     
     user_with_new_pass = await user_service.change_user_password(
