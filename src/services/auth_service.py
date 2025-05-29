@@ -220,7 +220,7 @@ class AuthService(Protocol):
             user_obj = await self.user_repo.update(
                 id=user_obj.get("id"),
                 data={
-                    "update_at": datetime.now(),
+                    "updated_at": datetime.now(),
                     "hash_password": await self.security_layer.hash_password(
                         password=data.get("hash_password")
                     ),
