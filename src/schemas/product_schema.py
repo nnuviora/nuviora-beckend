@@ -170,16 +170,15 @@ class ProductRecommendationSchema(BaseModel):
 
 
 class ProductSubscriptionSchema(BaseModel):
-    email: EmailStr
     product_id: int
+    email: EmailStr
 
     class Config:
         from_attributes = True
 
 
 class ProductSubscriptionResponse(BaseModel):
-    subscription_id: int
-    message: str = "Підписка успішно створена"
+    message: str
 
     class Config:
         from_attributes = True
