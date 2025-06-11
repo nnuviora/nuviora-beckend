@@ -4,7 +4,11 @@ from fastapi import status, Depends, Request, Response, HTTPException
 from repositories.user_repo import UserRepository
 from services.user_service import UserService
 from schemas.user_schema import UserBaseSchema, UserUpdateSchema, UserChangePasswrdSchema
-from api.v1.dependencies import get_current_user, user_dep
+from api.v1.dependencies import get_current_user, user_dep, get_load_service
+from fastapi import UploadFile, File
+from services.load_service import LoadService
+
+
 
 
 router = APIRouter(prefix="/profile", tags=["User Profile"])
@@ -122,3 +126,65 @@ async def update_user_password(
     #DELETE print statement IN PRODUCTION
     print (f"Passwoprd for user {user_with_new_pass.get('email')} was updated succesfully")
     return {"message": f"Пароль для користувача: {current_user.get('id')} успішно оновлений"}
+
+###########################################################################################
+#AVATAR UPLOAD AND GET
+###########################################################################################
+
+
+@router.post(
+    "/upload-avatar", 
+    status_code=status.HTTP_200_OK,
+    summary="Upload user avatar to S3",
+    responses={
+        401: {"description": "Unauthorized"},
+        400: {"description": "No file provided"},
+        500: {"description": "Failed to upload avatar"},
+    },
+)
+async def upload_avatar(
+    avatar: UploadFile = File(...),
+    current_user=Depends(get_current_user),
+    user_service: UserService = Depends(user_dep),
+    load_service: LoadService = Depends(get_load_service),
+) -> dict:
+    user_id = current_user.get("id") if isinstance(current_user, dict) else getattr(current_user, "id", None)
+    if not user_id:
+        raise HTTPException(status_code=400, detail="Invalid user data")
+
+    # 1. Завантажуємо на S3
+    avatar_url = await load_service.upload_image_to_s3(avatar)
+
+    # 2. Оновлюємо користувача
+    await user_service.update_user_avatar(user_id, avatar_url)
+
+    return {"avatar_url": avatar_url}
+
+###########################################################################################
+
+
+@router.get(
+    "/get-avatar", 
+    status_code=status.HTTP_200_OK,
+    summary="Get user avatar from S3",
+    responses={
+        401: {"description": "Unauthorized"},
+        400: {"description": "No file found"},
+        500: {"description": "Failed to read avatar"},
+    },
+)
+async def get_avatar(
+    current_user: user_base_schema_dep,
+    user_service: user_service_dep,
+    ):
+    user_id = current_user.get("id")
+    if not user_id:
+        raise HTTPException(status_code=400, detail="Invalid user data")
+    
+    
+    all_info_about_curr_user = await user_service.get_one_user(user_id=user_id)
+    avatar_url_for_curr_user = all_info_about_curr_user.get("avatar")
+    if not avatar_url_for_curr_user:
+        raise HTTPException(status_code=400, detail="Avatar not found")
+    
+    return {"avatar_url": avatar_url_for_curr_user}
