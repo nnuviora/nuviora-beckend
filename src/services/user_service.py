@@ -24,7 +24,9 @@ class UserService(Protocol):
             print(user_info_dict)
             if not user_info_dict:
                 raise self.error_handler(status_code=404, detail="User not found")
+            
             return user_info_dict
+        
         except self.error_handler as e:
             raise e
         except Exception as e:
@@ -98,6 +100,10 @@ class UserService(Protocol):
             
             plain_password = new_password.get("new_password") 
             hashed_password = await self.security_layer.hash_password(plain_password)
+
+            #invalidate the current token
+            await self.token_repo.delete(user_id=user_id)
+
 
             user_with_new_pass = await self.user_repo.update(
                 id=user_id, 
