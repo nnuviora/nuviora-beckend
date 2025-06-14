@@ -2,6 +2,7 @@ from datetime import datetime
 import uuid
 from sqlalchemy import Boolean, DECIMAL, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import JSONB
 from database import Base
 
 
@@ -170,7 +171,7 @@ class ProductImage(Base):
     product_image_id: Mapped[int] = mapped_column(primary_key=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("product.product_id"))
     image_description: Mapped[str] = mapped_column(Text)
-    image_url: Mapped[str] = mapped_column(String)
+    image_url: Mapped[dict] = mapped_column(JSONB, nullable=False)
     is_main: Mapped[bool] = mapped_column(Boolean, default=False)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
@@ -181,7 +182,7 @@ class ProductImage(Base):
             "product_image_id": self.product_image_id,
             "product_id": self.product_id,
             "image_description": self.image_description,
-            "image_url": self.image_url,
+            "image_urls": self.image_urls,
             "is_main": self.is_main,
             "sort_order": self.sort_order
         }

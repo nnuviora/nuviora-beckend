@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, List
+from typing import Dict, Optional, List
 
 
 class CategorySchema(BaseModel):
@@ -42,7 +42,7 @@ class TraitsSchema(BaseModel):
 class ProductImageSchema(BaseModel):
     product_image_id: Optional[int] = Field(default=None)
     image_description: Optional[str] = Field(default=None)
-    image_url: Optional[str] = Field(default=None)
+    image_url: str
     is_main: Optional[bool] = Field(default=False)
     sort_order: Optional[int] = Field(default=0)
 
@@ -90,7 +90,7 @@ class ProductCardSchema(BaseModel):
     currency: str = "UAH"
     average_rating: Optional[float] = 0.0
     small_description: Optional[str] = Field(default=None)
-    main_image_url: Optional[str] = None
+    main_image_urls: Dict[str, Optional[str]] = Field(default={"small": None, "medium": None, "large": None})
     category_name: Optional[str] = None
     brand_name: Optional[str] = None
     is_certified: Optional[bool] = False
@@ -222,6 +222,34 @@ class ProductVariationPriceSchema(BaseModel):
     variations: List[ProductVariationSchema]
     total_price: float
     currency: str = "UAH"
+
+    class Config:
+        from_attributes = True
+
+
+class ProductImportSchema(BaseModel):
+    product_id: int
+    name: str
+    description: str
+    traits_id: Optional[int] = None
+    price: float
+    currency: str = "UAH"
+    availability: bool = True
+    in_stock: bool = True
+    stock_quantity: int
+    is_certified: bool = False
+    certification_info: Optional[str] = None
+    benefits: Optional[str] = None
+    usage_instructions: Optional[str] = None
+    average_rating: Optional[float] = 0.0
+    review_count: Optional[int] = 0
+    category: CategorySchema
+    subcategory: SubCategorySchema
+    brand: BrandSchema
+    images: List[ProductImageSchema]
+    features: List[FeatureSchema]
+    reviews: List[ReviewSchema]
+    variations: List[ProductVariationSchema]
 
     class Config:
         from_attributes = True

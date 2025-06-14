@@ -6,38 +6,153 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import select, func, and_, or_
 
 from database import get_db
-from schemas.product_schema import (
-    FeatureSchema,
-    ProductCardSchema, 
-    ProductDetailSchema,
-    ProductImageSchema, 
-    ProductSearchSuggestionSchema,
-    ProductComparisonSchema,
-    ProductRecommendationSchema,
-    ProductSubscriptionSchema,
-    ProductSubscriptionResponse,
-    ProductFiltersSchema,
-    ProductCatalogResponse,
-    PriceRangeSchema,
-    ProductVariationPriceSchema,
-    CategorySchema,
-    BrandSchema,
-    ReviewSchema,
-    SubCategorySchema
-)
-from models.product_model import (
-    Product, 
-    Category, 
-    Subcategory, 
-    Brand, 
-    Review, 
-    ProductImage,
-    Feature,
-    ProductVariation,
-    ProductSubscription
-)
+from schemas.product_schema import *
+from models.product_model import *
 
 router = APIRouter(prefix="/product", tags=["Product"])
+
+
+@router.post("/import", response_model=List[ProductDetailSchema],
+    responses={
+        200: {"description": "Дані успішно імпортовано"},
+        400: {"description": "Невірні дані"},
+        500: {"description": "Упс! Щось пішло не так. Спробуйте пізніше"},
+})
+async def import_products(
+    products_data: List[ProductImportSchema],
+    db: AsyncSession = Depends(get_db)
+):
+    try:
+        imported_products = []
+        for product_data in products_data:
+            category_result = await db.execute(
+                select(Category).where(Category.category_id == product_data.category.category_id)
+            )
+            category = category_result.scalar_one_or_none()
+            if not category:
+                category = Category(
+                    category_id=product_data.category.category_id,
+                    name=product_data.category.name,
+                    description=product_data.category.description
+                )
+                db.add(category)
+                await db.flush()
+
+            subcategory_result = await db.execute(
+                select(Subcategory).where(Subcategory.subcategory_id == product_data.subcategory.subcategory_id)
+            )
+            subcategory = Subcategory(
+                subcategory_id=product_data.subcategory.subcategory_id,
+                name=product_data.subcategory.name,
+                description=product_data.subcategory.description,
+                category_id=product_data.category.category_id
+                )
+            db.add(subcategory)
+            await db.flush()
+
+            brand_result = await db.execute(
+                select(Brand).where(Brand.brand_id == product_data.brand.brand_id)
+            )
+            brand = brand_result.scalar_one_or_none()
+            if not brand:
+                brand = Brand(
+                    brand_id=product_data.brand.brand_id,
+                    name=product_data.brand.name,
+                    description=product_data.brand.description,
+                    logo_url=product_data.brand.logo_url
+                )
+                db.add(brand)
+                await db.flush()
+            
+            product_result = await db.execute(
+                select(Product).where(Product.product_id == product_data.product_id)
+            )
+            product = product_result.scalar_one_or_none()
+            if product:
+                product.name = product_data.name
+                product.description = product_data.description
+                product.price = product_data.price
+                product.currency = product_data.currency
+                product.availability = product_data.availability
+                product.in_stock = product_data.in_stock
+                product.stock_quantity = product_data.stock_quantity
+                product.is_certified = product_data.is_certified
+                product.certification_info = product_data.certification_info
+                product.benefits = product_data.benefits
+                product.usage_instructions = product_data.usage_instructions
+                product.category_id = category.category_id
+                product.subcategory_id = subcategory.subcategory_id
+                product.brand_id = brand.brand_id
+            else:
+                product = Product(
+                    product_id=product_data.product_id,
+                    name=product_data.name,
+                    description=product_data.description,
+                    small_description=product_data.description[:200],
+                    price=product_data.price,
+                    currency=product_data.currency,
+                    availability=product_data.availability,
+                    in_stock=product_data.in_stock,
+                    stock_quantity=product_data.stock_quantity,
+                    is_certified=product_data.is_certified,
+                    certification_info=product_data.certification_info,
+                    benefits=product_data.benefits,
+                    usage_instructions=product_data.usage_instructions,
+                    category_id=category.category_id,
+                    subcategory_id=subcategory.subcategory_id,
+                    brand_id=brand.brand_id,
+                    product_image=product_data.images[0].image_url if product_data.images else None
+                )
+                db.add(product)
+                await db.flush()
+            
+            for image_data in product_data.images:
+                image_result = await db.execute(
+                    select(ProductImage).where(ProductImage.product_image_id == image_data.product_image_id)
+                )
+                image = image_result.scalar_one_or_none()
+                if not image:
+                    image = ProductImage(
+                        product_image=image_data.product_image_id,
+                        product_id=product.product_id,
+                        image_description=image_data.image_description,
+                        image_url={
+                            "small": image_data.image_url,
+                            "medium": image_data.image_url,
+                            "large": image_data.image_url
+                        },
+                        is_main=image_data.is_main,
+                        sort_order=image_data.sort_order
+                    )
+                    db.add(image)
+                    await db.flush()
+
+            imported_products.append(product)
+
+        await db.commit()
+
+        result = await db.execute(
+            select(Product).options(
+                joinedload(Product.images),
+                joinedload(Product.reviews),
+                joinedload(Product.features),
+                joinedload(Product.variations),
+                joinedload(Product.category),
+                joinedload(Product.subcategory),
+                joinedload(Product.brand)
+            ).where(Product.product_id.in_([p.product_id for p in imported_products]))
+        )
+        products = result.scalars().all()
+        return [ProductDetailSchema.from_orm(p) for p in products]
+    
+    except ValueError as e:
+        await db.rollback()
+        raise HTTPException(400, detail=f"Некоректні дані: {str(e)}")
+    
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(500, detail="Упс! Щось пішло не так. Спробуйте пізніше")
+
 
 @router.get("/products/{product_id}",
             responses={
@@ -204,7 +319,7 @@ async def get_product_catalog(
                 "currency": "UAH",
                 "average_rating": avg_rating,
                 "small_description": p.small_description,
-                "main_image_url": p.image_url,
+                "main_image_url": p.main_image_url,
                 "category_name": p.category,
                 "brand_name": p.brand,
                 "is_certified": p.is_certified,
