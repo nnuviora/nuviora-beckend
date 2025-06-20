@@ -31,26 +31,7 @@ services:
     volumes:
       - redis_data:/data
 
-  fastapi:
-    build:
-      context: ./src
-      dockerfile: Dockerfile
-    container_name: fastapi_app
-    restart: always
-    env_file:
-      - .env
-    environment:
-      - PYTHONUNBUFFERED=1
-    ports:
-      - "8000"
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    volumes:
-      - ./src:/app
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+  
 
   nginx:
     image: nginx:alpine

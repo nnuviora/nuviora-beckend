@@ -22,6 +22,8 @@ class ConfigSettings(BaseSettings):
 
     DB_URI: Optional[str] = Field(default=None)
 
+    print(f"DB_URI: {self.DB_URI}")
+
     @model_validator(mode="after")
     def generate_db_uri(self):
         if not self.DB_URI:
