@@ -44,8 +44,9 @@ class LoadService:
             raise HTTPException(status_code=500, detail="Failed to upload avatar to S3")
         except Exception as e:
             raise HTTPException(
-                status_code=500, detail=f"Image processing failed: {str(e)}"
-            )
+                status_code=500, detail=f"Image processing failed: {str(e)}")
+
+
 
     async def get_s3_image_from_db(self, user_uuid) -> str:
         key = f"avatars/{user_uuid}.webp"
