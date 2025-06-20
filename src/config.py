@@ -22,7 +22,10 @@ class ConfigSettings(BaseSettings):
 
     DB_URI: Optional[str] = Field(default=None)
 
-    print(f"DB_URI: {self.DB_URI}")
+    class Config:
+        env_file = ".env"
+
+    
 
     @model_validator(mode="after")
     def generate_db_uri(self):
@@ -67,3 +70,4 @@ class ConfigSettings(BaseSettings):
 
 
 config_setting = ConfigSettings()
+print(f"DB_URI: {config_setting.DB_URI}")
